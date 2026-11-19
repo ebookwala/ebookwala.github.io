@@ -1,74 +1,86 @@
 [
-    {
-          "id": "pyaar-ka-ehsaas",
-          "title": "Pyaar Ka Ehsaas",
-          "author": "MyeKitab",
-          "category": "Romance",
-          "price": 49,
-          "cover": "https://placehold.co/300x420/8e44ad/ffffff?text=Pyaar+Ka+Ehsaas",
-          "description": "Ek dil ko chhoo lene wali prem kahani, jisme do dilon ke beech ka safar dikhaya gaya hai jo mushkilon se guzarta hai aur anth mein pyaar ki jeet hoti hai.",
-          "preview": "Raat ka andhera dheere dheere shahar ko apne aagosh mein le raha tha, aur Riya khidki ke paas khadi, dur tak failey aasman ko dekh rahi thi. Uske zehan mein sirf ek hi naam gunj raha tha...",
-          "razorpayLink": "https://rzp.io/l/REPLACE-THIS-LINK-1",
-          "free": false
-    },
-    {
-          "id": "gaon-ki-kahani",
-          "title": "Gaon Ki Kahani",
-          "author": "MyeKitab",
-          "category": "Drama",
-          "price": 0,
-          "cover": "https://placehold.co/300x420/2c7a4b/ffffff?text=Gaon+Ki+Kahani",
-          "description": "Gaon ke jeevan, rishton aur sanskaro ki saral lekin bhavnatmak kahani.",
-          "preview": "Subah ki pehli kiran jab gaon ke khet-khaliyan par padi, tab se hi Ramu kaka apne kaam mein jut gaye the...",
-          "razorpayLink": "",
-          "free": true
-    },
-    {
-          "id": "adhuri-mohabbat-novel",
-          "title": "Adhuri Mohabbat",
-          "author": "MyeKitab",
-          "category": "Romance",
-          "price": 79,
-          "cover": "https://placehold.co/300x420/c0392b/ffffff?text=Adhuri+Mohabbat",
-          "description": "Woh mohabbat jo kabhi poori nahi ho payi, lekin jiski yaadein aaj bhi dil mein zinda hain.",
-          "preview": "Kuch kahaniyan adhuri reh jaati hain, lekin unki khushboo hamesha ke liye reh jaati hai...",
-          "razorpayLink": "https://rzp.io/l/REPLACE-THIS-LINK-2",
-          "free": false
-    },
-    {
-          "id": "rahasya-ki-raat",
-          "title": "Rahasya Ki Raat",
-          "author": "MyeKitab",
-          "category": "Thriller",
-          "price": 59,
-          "cover": "https://placehold.co/300x420/34495e/ffffff?text=Rahasya+Ki+Raat",
-          "description": "Ek raat, ek raaz, aur ek such jo sabka jeena mushkil kar deta hai.",
-          "preview": "Jab ghadi ne baarah baje, tab darwaze par khadi ek saaya nazar aayi...",
-          "razorpayLink": "https://rzp.io/l/REPLACE-THIS-LINK-3",
-          "free": false
-    },
-    {
-          "id": "hasrat",
-          "title": "Hasrat",
-          "author": "MyeKitab",
-          "category": "Drama",
-          "price": 39,
-          "cover": "https://placehold.co/300x420/d35400/ffffff?text=Hasrat",
-          "description": "Zindagi ki wo hasrat jo har kisi ke dil mein chhupi hoti hai.",
-          "preview": "Har shaam, Meera apni chhat par baith kar doob te suraj ko dekhti thi...",
-          "razorpayLink": "https://rzp.io/l/REPLACE-THIS-LINK-4",
-          "free": false
-    },
-    {
-          "id": "apne-rishte-apne-faisle",
-          "title": "Apne Rishte, Apne Faisle",
-          "author": "MyeKitab",
-          "category": "Self-Help",
-          "price": 49,
-          "cover": "covers/apne-rishte-apne-faisle.jpg",
-          "description": "Rishton ko samajhne aur behtar faisle lene ki ek vyavharik kaaryapustika, aakarshan, samvaad aur bharosa banaye rakhte hue aarthik swatantrata ki or badhne ka raasta dikhati hai.",
-          "preview": "Har rishta apne saath kuch sawal leke aata hai, hum kitna khulke baat karte hain, kitna bharosa karte hain, aur apne faisle khud kitni himmat se lete hain...",
-          "razorpayLink": "https://rzp.io/l/REPLACE-THIS-LINK-5",
-          "free": false
-    }
+        {
+                    "id": "pyaar-ka-ehsaas",
+                    "title": "Pyaar Ka Ehsaas",
+                    "author": "MyeKitab",
+                    "category": "Romance",
+                    "price": 49,
+                    "cover": "https://placehold.co/300x420/8e44ad/ffffff?text=Pyaar+Ka+Ehsaas",
+                    "description": "Ek dil ko chhoo lene wali prem kahani, jisme do dilon ke beech ka safar dikhaya gaya hai jo mushkilon se guzarta hai aur anth mein pyaar ki jeet hoti hai.",
+                    "preview": "Raat ka andhera dheere dheere shahar ko apne aagosh mein le raha tha, aur Riya khidki ke paas khadi, dur tak failey aasman ko dekh rahi thi. Uske zehan mein sirf ek hi naam gunj raha tha...",
+                    "razorpayLink": "https://rzp.io/l/REPLACE-THIS-LINK-1",
+                    "free": false
+        },
+        {
+                    "id": "gaon-ki-kahani",
+                    "title": "Gaon Ki Kahani",
+                    "author": "MyeKitab",
+                    "category": "Drama",
+                    "price": 0,
+                    "cover": "https://placehold.co/300x420/2c7a4b/ffffff?text=Gaon+Ki+Kahani",
+                    "description": "Gaon ke jeevan, rishton aur sanskaro ki saral lekin bhavnatmak kahani.",
+                    "preview": "Subah ki pehli kiran jab gaon ke khet-khaliyan par padi, tab se hi Ramu kaka apne kaam mein jut gaye the...",
+                    "razorpayLink": "",
+                    "free": true
+        },
+        {
+                    "id": "adhuri-mohabbat-novel",
+                    "title": "Adhuri Mohabbat",
+                    "author": "MyeKitab",
+                    "category": "Romance",
+                    "price": 79,
+                    "cover": "https://placehold.co/300x420/c0392b/ffffff?text=Adhuri+Mohabbat",
+                    "description": "Woh mohabbat jo kabhi poori nahi ho payi, lekin jiski yaadein aaj bhi dil mein zinda hain.",
+                    "preview": "Kuch kahaniyan adhuri reh jaati hain, lekin unki khushboo hamesha ke liye reh jaati hai...",
+                    "razorpayLink": "https://rzp.io/l/REPLACE-THIS-LINK-2",
+                    "free": false
+        },
+        {
+                    "id": "rahasya-ki-raat",
+                    "title": "Rahasya Ki Raat",
+                    "author": "MyeKitab",
+                    "category": "Thriller",
+                    "price": 59,
+                    "cover": "https://placehold.co/300x420/34495e/ffffff?text=Rahasya+Ki+Raat",
+                    "description": "Ek raat, ek raaz, aur ek such jo sabka jeena mushkil kar deta hai.",
+                    "preview": "Jab ghadi ne baarah baje, tab darwaze par khadi ek saaya nazar aayi...",
+                    "razorpayLink": "https://rzp.io/l/REPLACE-THIS-LINK-3",
+                    "free": false
+        },
+        {
+                    "id": "hasrat",
+                    "title": "Hasrat",
+                    "author": "MyeKitab",
+                    "category": "Drama",
+                    "price": 39,
+                    "cover": "https://placehold.co/300x420/d35400/ffffff?text=Hasrat",
+                    "description": "Zindagi ki wo hasrat jo har kisi ke dil mein chhupi hoti hai.",
+                    "preview": "Har shaam, Meera apni chhat par baith kar doob te suraj ko dekhti thi...",
+                    "razorpayLink": "https://rzp.io/l/REPLACE-THIS-LINK-4",
+                    "free": false
+        },
+        {
+                    "id": "apne-rishte-apne-faisle",
+                    "title": "Apne Rishte, Apne Faisle",
+                    "author": "MyeKitab",
+                    "category": "Self-Help",
+                    "price": 49,
+                    "cover": "covers/apne-rishte-apne-faisle.jpg",
+                    "description": "Rishton ko samajhne aur behtar faisle lene ki ek vyavharik kaaryapustika, aakarshan, samvaad aur bharosa banaye rakhte hue aarthik swatantrata ki or badhne ka raasta dikhati hai.",
+                    "preview": "Har rishta apne saath kuch sawal leke aata hai, hum kitna khulke baat karte hain, kitna bharosa karte hain, aur apne faisle khud kitni himmat se lete hain...",
+                    "razorpayLink": "https://rzp.io/l/REPLACE-THIS-LINK-5",
+                    "free": false
+        },
+        {
+                    "id": "aakarshan-ka-manovigyan",
+                    "title": "Aakarshan Ka Manovigyan",
+                    "author": "MyeKitab",
+                    "category": "Human Psychology",
+                    "price": 39,
+                    "cover": "https://placehold.co/300x420/16a085/ffffff?text=Aakarshan+Ka+Manovigyan",
+                    "description": "Pehli chhaap, paraspar ruchi, hormone aur sharirik gandh se lekar sehmati aur seemaon tak, rishton ke aakarshan ko shodh ke aadhar par samjhati ek vistrit 72-adhyaay ki guide.",
+                    "preview": "Kisi vyakti ki aawaz, muskaan, baatcheet ya prakritik gandh aapko uski or khinch sakti hai. Is kitaab mein aakarshan aur anukulta, pehli chhaap, paraspar ruchi aur swasth judaav ko saral tareeke se samjhaya gaya hai...",
+                    "razorpayLink": "https://rzp.io/l/REPLACE-THIS-LINK-6",
+                    "free": false
+        }
 ]
