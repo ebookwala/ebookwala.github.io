@@ -23,7 +23,7 @@
                     "razorpayLink": "",
                     "free": true
         },
-        {
+                "cover": "covers/Neon%20minds%20in%20Mumbai%20rain.png",
                     "id": "adhuri-mohabbat-novel",
                     "title": "Adhuri Mohabbat",
                     "author": "MyeKitab",
@@ -77,7 +77,7 @@
                     "author": "MyeKitab",
                     "category": "Human Psychology",
                     "price": 39,
-                    "cover": "https://placehold.co/300x420/16a085/ffffff?text=Aakarshan+Ka+Manovigyan",
+                            "cover": "covers/Neon%20minds%20in%20Mumbai%20rain.png",
                     "description": "Pehli chhaap, paraspar ruchi, hormone aur sharirik gandh se lekar sehmati aur seemaon tak, rishton ke aakarshan ko shodh ke aadhar par samjhati ek vistrit 72-adhyaay ki guide.",
                     "preview": "Kisi vyakti ki aawaz, muskaan, baatcheet ya prakritik gandh aapko uski or khinch sakti hai. Is kitaab mein aakarshan aur anukulta, pehli chhaap, paraspar ruchi aur swasth judaav ko saral tareeke se samjhaya gaya hai...",
                     "razorpayLink": "https://rzp.io/l/REPLACE-THIS-LINK-6",
