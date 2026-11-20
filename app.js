@@ -88,7 +88,7 @@ async function initBookPage() {
                               <p>${book.description}</p>
                                     <div class="price-tag ${isFree ? 'free' : ''}">${isFree ? 'Free' : '₹' + book.price}</div>
                                           ${isFree
-                                                    ? `<a class="buy-btn" href="#" onclick="alert('Yahan free ebook ki download/reading link lagayein'); return false;">Padhna Shuru Karein</a>`
+                                                    ? `<a class="buy-btn" href="${book.file || '#'}" download target="_blank" rel="noopener">Download Karein / Padhna Shuru Karein</a>`
                                                     : `<a class="buy-btn" href="${book.razorpayLink || '#'}" target="_blank" rel="noopener">Khareedein — ₹${book.price}</a>`
                                           }
                                                 <div class="preview-box">${book.preview}</div>
