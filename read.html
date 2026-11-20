@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>ebookwala reader</title>
+<link rel="stylesheet" href="style.css">
+<script defer src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js"></script>
+</head>
+<body class="reader">
+  <header>
+    <h1><a href="index.html">📚 ebookwala</a></h1>
+    <strong id="readerTitle"></strong>
+    <div class="auth-bar" id="authBar"></div>
+  </header>
+
+  <div class="reader-wrap" id="readerWrap"></div>
+  <div class="reader-msg" id="readerMsg">Load ho raha hai…</div>
+  <div class="reader-bar" id="readerBar" style="display:none"></div>
+
+  <script src="app.js"></script>
+  <script type="module" src="auth.js"></script>
+  <script>window.addEventListener("load", initReader);</script>
+</body>
+</html>
