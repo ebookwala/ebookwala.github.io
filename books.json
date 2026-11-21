@@ -8,7 +8,7 @@
     "cover": "https://placehold.co/300x420/8e44ad/ffffff?text=Pyaar+Ka+Ehsaas",
     "description": "Ek dil ko chhoo lene wali prem kahani, jisme do dilon ke beech ka safar dikhaya gaya hai jo mushkilon se guzarta hai aur anth mein pyaar ki jeet hoti hai.",
     "preview": "Raat ka andhera dheere dheere shahar ko apne aagosh mein le raha tha, aur Riya khidki ke paas khadi, dur tak failey aasman ko dekh rahi thi. Uske zehan mein sirf ek hi naam gunj raha tha...",
-    "razorpayLink": "https://rzp.io/l/REPLACE-THIS-LINK-1",
+    "razorpayLink": "https://rzp.io/rzp/RenTPbek",
     "free": false
   },
   {
@@ -32,7 +32,7 @@
     "cover": "https://placehold.co/300x420/c0392b/ffffff?text=Adhuri+Mohabbat",
     "description": "Woh mohabbat jo kabhi poori nahi ho payi, lekin jiski yaadein aaj bhi dil mein zinda hain.",
     "preview": "Kuch kahaniyan adhuri reh jaati hain, lekin unki khushboo hamesha ke liye reh jaati hai...",
-    "razorpayLink": "https://rzp.io/l/REPLACE-THIS-LINK-2",
+    "razorpayLink": "https://rzp.io/rzp/bu1BA57",
     "free": false
   },
   {
@@ -44,7 +44,7 @@
     "cover": "https://placehold.co/300x420/34495e/ffffff?text=Rahasya+Ki+Raat",
     "description": "Ek raat, ek raaz, aur ek such jo sabka jeena mushkil kar deta hai.",
     "preview": "Jab ghadi ne baarah baje, tab darwaze par khadi ek saaya nazar aayi...",
-    "razorpayLink": "https://rzp.io/l/REPLACE-THIS-LINK-3",
+    "razorpayLink": "https://rzp.io/rzp/ZGfEo6I",
     "free": false
   },
   {
@@ -56,7 +56,7 @@
     "cover": "https://placehold.co/300x420/d35400/ffffff?text=Hasrat",
     "description": "Zindagi ki wo hasrat jo har kisi ke dil mein chhupi hoti hai.",
     "preview": "Har shaam, Meera apni chhat par baith kar doob te suraj ko dekhti thi...",
-    "razorpayLink": "https://rzp.io/l/REPLACE-THIS-LINK-4",
+    "razorpayLink": "https://rzp.io/rzp/i0rxOz7",
     "free": false
   },
   {
@@ -68,7 +68,7 @@
     "cover": "covers/apne-rishte-apne-faisle.jpg",
     "description": "Rishton ko samajhne aur behtar faisle lene ki ek vyavharik kaaryapustika, aakarshan, samvaad aur bharosa banaye rakhte hue aarthik swatantrata ki or badhne ka raasta dikhati hai.",
     "preview": "Har rishta apne saath kuch sawal leke aata hai, hum kitna khulke baat karte hain, kitna bharosa karte hain, aur apne faisle khud kitni himmat se lete hain...",
-    "razorpayLink": "https://rzp.io/l/REPLACE-THIS-LINK-5",
+    "razorpayLink": "https://rzp.io/rzp/n0Is6wu",
     "free": false
   },
   {
@@ -80,7 +80,7 @@
     "cover": "covers/Neon%20minds%20in%20Mumbai%20rain.png",
     "description": "Pehli chhaap, paraspar ruchi, hormone aur sharirik gandh se lekar sehmati aur seemaon tak, rishton ke aakarshan ko shodh ke aadhar par samjhati ek vistrit 72-adhyaay ki guide.",
     "preview": "Kisi vyakti ki aawaz, muskaan, baatcheet ya prakritik gandh aapko uski or khinch sakti hai. Is kitaab mein aakarshan aur anukulta, pehli chhaap, paraspar ruchi aur swasth judaav ko saral tareeke se samjhaya gaya hai...",
-    "razorpayLink": "https://rzp.io/l/REPLACE-THIS-LINK-6",
+    "razorpayLink": "https://rzp.io/rzp/C7tGSnWw",
     "free": false
   },
   {
@@ -88,12 +88,12 @@
     "title": "ChatGPT Mastering Volume 1",
     "author": "MyeKitab",
     "category": "AI Tech",
-    "price": 0,
+    "price": 49,
     "cover": "covers/chatgpt-mastering-vol-1.jpg",
     "description": "ChatGPT Mastering ki pehli kitaab: AI ke itihaas se lekar Machine Learning, Deep Learning, Neural Networks, Generative AI, Large Language Models, Tokens aur ChatGPT ke vikas tak, saral Hindi mein. Har adhyay mein abhyas, udaharan aur copy karne layak prompts hain, aur ant mein aap apna pehla AI project banate hain.",
     "preview": "AI ka vikas kisi ek din mein nahi hua. Ginti, tark aur niyamon se shuru hokar shodhkartaon ne aise model banaye jo data se seekhte hain. 1950 ke dashak mein mashin buddhimatta par charcha tez hui, phir machine learning aaya, aur aaj hum ChatGPT jaise bade bhasha model istemal karte hain...",
-    "razorpayLink": "",
-    "free": true,
+    "razorpayLink": "https://rzp.io/l/REPLACE-THIS-LINK-7",
+    "free": false,
     "file": "ChatGPT_Mastering_Volume_1_Privacy_Updated.docx"
   },
   {
@@ -101,12 +101,12 @@
     "title": "ChatGPT Mastering Volume 2",
     "author": "MyeKitab",
     "category": "AI Tech",
-    "price": 0,
+    "price": 49,
     "cover": "covers/chatgpt-mastering-vol-2.jpg",
     "description": "ChatGPT Mastering ki doosri kitaab: AI Images aur 3D Art ki rachnatmak karyapustika. Image Generation, drishya prompts, photorealism, 3D rendering, composition aur lighting ke 60 adhyay (721-780), jisme har adhyay mein abhyas, prompt udaharan aur sudhar ki rananiti hai.",
     "preview": "Image Generation mein safal parinam sirf zyada visheshan jodne se nahi milta. Drishya ka uddeshya, darshak, upyog-madhyam aur pramukh vishay pehle tay karna padta hai. Is kitaab mein aap seekhenge ki ek chhote prompt ko kaise niyantrit tareeke se behtar banaya jaye...",
-    "razorpayLink": "",
-    "free": true,
+    "razorpayLink": "https://rzp.io/l/REPLACE-THIS-LINK-8",
+    "free": false,
     "file": "ChatGPT_Mastering_Volume_2_Screenshots_Updated_2026-11-20.docx"
   },
   {
@@ -114,12 +114,12 @@
     "title": "ChatGPT Mastering Volume 3",
     "author": "MyeKitab",
     "category": "AI Tech",
-    "price": 0,
+    "price": 49,
     "cover": "covers/chatgpt-mastering-vol-3.jpg",
     "description": "ChatGPT Mastering ki teesri kitaab: Development, Agents aur Connected Work. Coding aur Codex se shuru hokar HTML, CSS aur aage ke vikas-vishayon tak, adhyay 1441 se 2160 ke study sanskaran mein, jisme har adhyay mein vyavharik abhyas diye gaye hain.",
     "preview": "Programming sikhna ek hi din mein nahi hota, lekin sahi kram se shuru karne par yeh saral ho jata hai. Is kitaab mein aap pehle programming ka parichay, phir HTML aur CSS ki buniyaad seekhte hain, aur dekhte hain ki ChatGPT aur Codex kaise aapke coding kaam mein madad karte hain...",
-    "razorpayLink": "",
-    "free": true,
+    "razorpayLink": "https://rzp.io/l/REPLACE-THIS-LINK-9",
+    "free": false,
     "file": "ChatGPT_Mastering_Volume_3_Screenshots_Updated_2026-11-20.docx"
   },
   {
@@ -127,12 +127,12 @@
     "title": "ChatGPT Mastering Volume 4",
     "author": "MyeKitab",
     "category": "AI Tech",
-    "price": 0,
+    "price": 49,
     "cover": "covers/chatgpt-mastering-vol-4.jpg",
     "description": "ChatGPT Mastering ki chauthi kitaab: Education aur Productivity. Study Mode, adhyayan yojana, tuition, bhasha seekhna, anuvad aur pariksha taiyari ke vishayon par adhyay 2161 se 2880 ka sachitra study sanskaran, jisme har adhyay mein abhyas diye gaye hain.",
     "preview": "Padhai ka sabse bada sawal yeh hota hai ki shuru kahan se karein. Is kitaab mein aap Study Mode se shuruaat karte hain, phir apni adhyayan yojana banate hain, aur dekhte hain ki ChatGPT tuition, bhasha seekhne, anuvad aur pariksha taiyari mein kaise madad kar sakta hai...",
-    "razorpayLink": "",
-    "free": true,
+    "razorpayLink": "https://rzp.io/l/REPLACE-THIS-LINK-10",
+    "free": false,
     "file": "ChatGPT_Mastering_Volume_4_Screenshots_Updated_2026-11-20.docx"
   },
   {
@@ -144,7 +144,7 @@
     "cover": "chatgpt-mastering-combo.jpg",
     "description": "Combo offer: ChatGPT Mastering ke chaaron volume (1, 2, 3 aur 4) ek saath sirf ₹149 mein, alag-alag kharidne par ₹196 lagte. AI ki buniyaad se lekar Image Generation, Development aur Education tak ka poora safar.",
     "preview": "ChatGPT Mastering ke chaaron volumes ek saath: AI ka itihaas aur ChatGPT, AI Images aur 3D Art, Development aur Agents, aur Education aur Productivity.",
-    "razorpayLink": "https://rzp.io/l/REPLACE-THIS-LINK-11",
+    "razorpayLink": "https://rzp.io/rzp/oYMK1qRO",
     "free": false
   }
 ]
