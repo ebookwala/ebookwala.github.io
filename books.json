@@ -146,5 +146,18 @@
     "preview": "ChatGPT Mastering ke chaaron volumes ek saath: AI ka itihaas aur ChatGPT, AI Images aur 3D Art, Development aur Agents, aur Education aur Productivity.",
     "razorpayLink": "https://rzp.io/rzp/oYMK1qRO",
     "free": false
+  },
+  {
+    "id": "naukri-ya-business",
+    "title": "नौकरी करें या बिजनेस?",
+    "author": "MyeKitab",
+    "category": "Self-Help",
+    "price": 39,
+    "cover": "naukri-ya-business.jpg",
+    "description": "करियर, कमाई, स्वतंत्रता और सफलता का व्यावहारिक मार्गदर्शक। नौकरी के फायदे-नुकसान, बिजनेस के अवसर और जोखिम, वास्तविक गणना व उदाहरण, छोटे निवेश से बड़े बिजनेस और नौकरी के साथ साइड बिजनेस, 30 अध्यायों में।",
+    "preview": "सुरक्षा, स्वतंत्रता, जोखिम और विकास के बीच समझदारी से निर्णय लेने की व्यावहारिक पुस्तक। यह पुस्तक नहीं पूछती कि कौन श्रेष्ठ है, बल्कि पूछती है कि आपके संसाधनों, परिवार और समय के लिए अभी कौन-सा निर्णय समझदारी है...",
+    "razorpayLink": "https://rzp.io/l/REPLACE-THIS-LINK-12",
+    "free": false,
+    "file": "naukri-ya-business.pdf"
   }
 ]
