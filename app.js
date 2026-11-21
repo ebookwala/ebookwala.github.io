@@ -138,8 +138,11 @@ async function initBookPage() {
             <p>${book.description}</p>
             <div class="price-tag ${isFree ? 'free' : ''}">${isFree ? 'Free' : '₹' + book.price}</div>
             ${actions}
+            <div class="share-wrap" id="shareWrap"></div>
             <div class="preview-box">${book.preview}</div>
         </div>`;
+
+    initShare(book);
 
     if (isFree && book.file) {
         document.getElementById("readBtn").addEventListener("click", () => {
@@ -164,6 +167,63 @@ async function initBookPage() {
                 : "🔒 Padhne ya download karne ke liye Google se login zaroori hai.";
         });
     }
+}
+
+// ---------- Share ----------
+function injectShareStyles() {
+    if (document.getElementById("shareStyles")) return;
+    const st = document.createElement("style");
+    st.id = "shareStyles";
+    st.textContent = `
+    .share-wrap{margin:14px 0 4px;position:relative}
+    .share-btn{background:transparent;color:var(--accent-dark,#0fa800);border:2px solid var(--accent,#39ff14);border-radius:10px;padding:8px 16px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 0 10px rgba(57,255,20,.35)}
+    .share-btn:hover{box-shadow:0 0 18px rgba(57,255,20,.7)}
+    .share-menu{display:none;flex-wrap:wrap;gap:8px;margin-top:10px}
+    .share-menu.open{display:flex}
+    .share-menu a,.share-menu button{background:#fff;color:#111;border:1px solid #d6e8d6;border-radius:999px;padding:7px 14px;font-size:.9rem;text-decoration:none;cursor:pointer;font-family:inherit}
+    .share-menu a:hover,.share-menu button:hover{border-color:var(--accent,#39ff14);box-shadow:0 0 10px rgba(57,255,20,.5)}
+    .share-toast{margin-top:8px;font-size:.88rem;color:var(--accent-dark,#0fa800)}`;
+    document.head.appendChild(st);
+}
+
+function initShare(book) {
+    const wrap = document.getElementById("shareWrap");
+    if (!wrap) return;
+    injectShareStyles();
+    const url = location.origin + location.pathname.replace(/[^/]*$/, "") + "book.html?id=" + encodeURIComponent(book.id);
+    const text = book.title + " — ebookwala par";
+    const eu = encodeURIComponent(url), et = encodeURIComponent(text);
+    wrap.innerHTML = `
+        <button class="share-btn" id="shareBtn" type="button">🔗 Share Karein</button>
+        <div class="share-menu" id="shareMenu">
+            <button type="button" id="shCopy">📋 Link copy</button>
+            <a target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(text + " " + url)}">WhatsApp</a>
+            <a target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=${eu}">Facebook</a>
+            <button type="button" id="shInsta">Instagram</button>
+            <a target="_blank" rel="noopener" href="https://t.me/share/url?url=${eu}&text=${et}">Telegram</a>
+        </div>
+        <div class="share-toast" id="shareToast"></div>`;
+    const toast = m => { const t = document.getElementById("shareToast"); t.textContent = m; setTimeout(() => { t.textContent = ""; }, 3500); };
+    const copy = async () => {
+        try { await navigator.clipboard.writeText(url); return true; }
+        catch (e) {
+            const ta = document.createElement("textarea"); ta.value = url; document.body.appendChild(ta); ta.select();
+            let ok = false; try { ok = document.execCommand("copy"); } catch (e2) {}
+            ta.remove(); return ok;
+        }
+    };
+    document.getElementById("shareBtn").addEventListener("click", async () => {
+        if (navigator.share) {
+            try { await navigator.share({ title: book.title, text, url }); return; } catch (e) { if (e && e.name === "AbortError") return; }
+        }
+        document.getElementById("shareMenu").classList.toggle("open");
+    });
+    document.getElementById("shCopy").addEventListener("click", async () => { toast((await copy()) ? "✅ Link copy ho gaya" : "Link copy nahi hua, manually copy karein: " + url); });
+    document.getElementById("shInsta").addEventListener("click", async () => {
+        const ok = await copy();
+        toast(ok ? "✅ Link copy ho gaya, ab Instagram mein paste karke share karein." : "Instagram par link manually paste karein: " + url);
+        window.open("https://www.instagram.com/", "_blank", "noopener");
+    });
 }
 
 // ---------- Online reader ----------
