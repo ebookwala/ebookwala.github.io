@@ -68,7 +68,7 @@ function renderGrid(books) {
         return;
     }
     grid.innerHTML = books.map(b => `
-        <a class="card" href="book.html?id=${encodeURIComponent(b.id)}">
+        <a class="card" href="${encodeURIComponent(b.id)}.html">
             <img src="${b.cover}" alt="${b.title}" loading="lazy">
             <div class="info">
                 <p class="title">${b.title}</p>
@@ -104,7 +104,7 @@ function initHome() {
 async function initBookPage() {
     initAuthBar();
     const params = new URLSearchParams(window.location.search);
-    const id = params.get("id");
+    const id = window.BOOK_ID || params.get("id");
     const res = await fetch("books.json?v=" + Date.now(), { cache: "no-store" });
     const books = await res.json();
     const book = books.find(b => b.id === id);
@@ -190,7 +190,7 @@ function initShare(book) {
     const wrap = document.getElementById("shareWrap");
     if (!wrap) return;
     injectShareStyles();
-    const url = location.origin + location.pathname.replace(/[^/]*$/, "") + "book.html?id=" + encodeURIComponent(book.id);
+    const url = location.origin + "/" + encodeURIComponent(book.id) + ".html";
     const text = book.title + " — ebookwala par";
     const eu = encodeURIComponent(url), et = encodeURIComponent(text);
     wrap.innerHTML = `

@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://ebookwala.github.io/index.html</loc></url>
-  <url><loc>https://ebookwala.github.io/book.html?id=pyaar-ka-ehsaas</loc></url>
-  <url><loc>https://ebookwala.github.io/book.html?id=gaon-ki-kahani</loc></url>
-  <url><loc>https://ebookwala.github.io/book.html?id=adhuri-mohabbat-novel</loc></url>
-  <url><loc>https://ebookwala.github.io/book.html?id=rahasya-ki-raat</loc></url>
-  <url><loc>https://ebookwala.github.io/book.html?id=hasrat</loc></url>
-  <url><loc>https://ebookwala.github.io/book.html?id=apne-rishte-apne-faisle</loc></url>
-  <url><loc>https://ebookwala.github.io/book.html?id=aakarshan-ka-manovigyan</loc></url>
+  <url><loc>https://ebookwala.github.io/</loc><lastmod>2026-11-22</lastmod></url>
+  <url><loc>https://ebookwala.github.io/pyaar-ka-ehsaas.html</loc><lastmod>2026-11-22</lastmod></url>
+  <url><loc>https://ebookwala.github.io/gaon-ki-kahani.html</loc><lastmod>2026-11-22</lastmod></url>
+  <url><loc>https://ebookwala.github.io/adhuri-mohabbat-novel.html</loc><lastmod>2026-11-22</lastmod></url>
+  <url><loc>https://ebookwala.github.io/rahasya-ki-raat.html</loc><lastmod>2026-11-22</lastmod></url>
+  <url><loc>https://ebookwala.github.io/hasrat.html</loc><lastmod>2026-11-22</lastmod></url>
+  <url><loc>https://ebookwala.github.io/apne-rishte-apne-faisle.html</loc><lastmod>2026-11-22</lastmod></url>
+  <url><loc>https://ebookwala.github.io/aakarshan-ka-manovigyan.html</loc><lastmod>2026-11-22</lastmod></url>
+  <url><loc>https://ebookwala.github.io/chatgpt-mastering-volume-1.html</loc><lastmod>2026-11-22</lastmod></url>
+  <url><loc>https://ebookwala.github.io/chatgpt-mastering-volume-2.html</loc><lastmod>2026-11-22</lastmod></url>
+  <url><loc>https://ebookwala.github.io/chatgpt-mastering-volume-3.html</loc><lastmod>2026-11-22</lastmod></url>
+  <url><loc>https://ebookwala.github.io/chatgpt-mastering-volume-4.html</loc><lastmod>2026-11-22</lastmod></url>
+  <url><loc>https://ebookwala.github.io/chatgpt-mastering-combo.html</loc><lastmod>2026-11-22</lastmod></url>
+  <url><loc>https://ebookwala.github.io/naukri-ya-business.html</loc><lastmod>2026-11-22</lastmod></url>
+  <url><loc>https://ebookwala.github.io/rahu-mahagranth.html</loc><lastmod>2026-11-22</lastmod></url>
+  <url><loc>https://ebookwala.github.io/privacy.html</loc><lastmod>2026-11-22</lastmod></url>
+  <url><loc>https://ebookwala.github.io/terms.html</loc><lastmod>2026-11-22</lastmod></url>
 </urlset>
