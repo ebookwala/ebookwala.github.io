@@ -176,5 +176,18 @@
       "rahu-mahagranth-p1.pdf",
       "rahu-mahagranth-p2.pdf"
     ]
+  },
+  {
+    "id": "gemini-encyclopedia-volume-1",
+    "title": "Gemini Encyclopedia Volume 1",
+    "author": "MyeKitab",
+    "category": "AI Tech",
+    "price": 99,
+    "cover": "covers/gemini-encyclopedia-volume-1.png",
+    "description": "Google Gemini par ek vistrit sandarbh granth — 10-bhag ke sanyukt adhyayan sankalan ka pehla khand (adhyay 1-60), jisme Text, Image, Video aur Code Generation, Research & Summarize, Document Analysis, Data & Charts aur Multimodal AI Vision jaise sabhi tools shamil hain. Har adhyay mein step-by-step abhyas aur copy-paste karne layak Hindi prompts diye gaye hain.",
+    "preview": "आप एक धैर्यवान हिंदी AI प्रशिक्षक हैं। विषय: कॉपीराइट आधार। मेरा उद्देश्य: मूल रचना और उपयोग अधिकार। कृपया शुरुआती व्यक्ति के लिए 5 स्पष्ट चरण, 2 उदाहरण, 3 आम गलतियाँ और एक जाँच-सूची दें। तथ्य अनिश्चित हों तो साफ बताएं...",
+    "razorpayLink": "",
+    "free": false,
+    "file": "gemini-encyclopedia-volume-1.pdf"
   }
 ]
