@@ -108,11 +108,34 @@ function applyFilters() {
     renderGrid(filtered);
 }
 
+function renderSubBanner() {
+    const el = document.getElementById("subBanner");
+    if (!el) return;
+    const sub = window.ebookSub || {};
+    if (!sub.ready) { el.style.display = "none"; return; }
+    if (sub.active) {
+        el.style.display = "flex";
+        el.innerHTML = `<p>✅ Aapka trial/subscription active hai — saari ebooks padh sakte hain.</p>
+            <button type="button" class="buy-btn secondary" id="subCancelBtn">Subscription Cancel Karein</button>`;
+        const cancelBtn = document.getElementById("subCancelBtn");
+        if (cancelBtn) cancelBtn.addEventListener("click", () => window.cancelSubscription && window.cancelSubscription());
+        return;
+    }
+    el.style.display = "flex";
+    el.innerHTML = `<p>🎁 3-Din Free Trial lein — sirf ₹2 mein sabhi ebooks padhein (trial ke baad ₹49/month, kabhi bhi cancel karein)</p>
+        <button type="button" class="buy-btn" id="subTrialBtn">Free Trial Shuru Karein</button>`;
+    const trialBtn = document.getElementById("subTrialBtn");
+    if (trialBtn) trialBtn.addEventListener("click", () => window.startTrial && window.startTrial());
+}
+
 function initHome() {
     initAuthBar();
     loadBooks();
     const search = document.getElementById("searchInput");
     if (search) search.addEventListener("input", applyFilters);
+    onAuth(renderSubBanner);
+    window.addEventListener("ebook-sub", renderSubBanner);
+    renderSubBanner();
 }
 
 // ---------- Book detail page ----------
@@ -141,6 +164,16 @@ async function initBookPage() {
             <p class="login-note" id="loginNote"></p>`;
     } else if (isFree) {
         actions = `<p class="login-note">Is ebook ki file abhi upload nahi hui. Jald hi aayegi.</p>`;
+    } else if (book.file) {
+        // Paid book with a readable file: buy it once, OR unlock it (and every
+        // other book) with the 3-day trial / ₹49-month subscription.
+        actions = `
+            <div class="btn-row">
+                <a class="buy-btn" href="${book.razorpayLink || '#'}" target="_blank" rel="noopener">Khareedein — ₹${book.price}</a>
+                <button class="buy-btn secondary" id="readBtn">📖 Padhein</button>
+            </div>
+            <p class="login-note" id="loginNote"></p>
+            <p class="trial-note">🎁 Ya <button type="button" class="link-btn" id="trialBtn">3-Din Free Trial</button> lekar <strong>sabhi ebooks</strong> padhein — sirf ₹2, trial ke baad ₹49/month (kabhi bhi cancel karein)</p>`;
     } else {
         actions = `<a class="buy-btn" href="${book.razorpayLink || '#'}" target="_blank" rel="noopener">Khareedein — ₹${book.price}</a>`;
     }
@@ -181,6 +214,33 @@ async function initBookPage() {
                 ? "✅ Aap login hain, padh ya download kar sakte hain."
                 : "🔒 Padhne ya download karne ke liye Google se login zaroori hai.";
         });
+    } else if (!isFree && book.file) {
+        document.getElementById("readBtn").addEventListener("click", () => {
+            requireLogin().then(u => {
+                if (!u) return;
+                if (window.ebookSub && window.ebookSub.active) {
+                    window.location.href = "read.html?id=" + encodeURIComponent(book.id);
+                } else {
+                    alert("Is ebook ko padhne ke liye khareedein ya 3-din free trial lein.");
+                }
+            });
+        });
+        const trialBtn = document.getElementById("trialBtn");
+        if (trialBtn) trialBtn.addEventListener("click", () => window.startTrial && window.startTrial());
+        const updateNote = () => {
+            const note = document.getElementById("loginNote");
+            if (!note) return;
+            const u = window.ebookAuth && window.ebookAuth.user;
+            const subActive = window.ebookSub && window.ebookSub.active;
+            note.textContent = !u
+                ? "🔒 Padhne ke liye Google se login zaroori hai."
+                : subActive
+                ? "✅ Aapka trial/subscription active hai — sabhi ebooks padh sakte hain."
+                : "Is ebook ko padhne ke liye khareedein ya free trial lein.";
+        };
+        onAuth(updateNote);
+        window.addEventListener("ebook-sub", updateNote);
+        updateNote();
     }
 }
 
@@ -260,8 +320,21 @@ async function initReader() {
     document.title = book.title + " — ebookwala reader";
     document.getElementById("readerTitle").textContent = book.title;
 
+    const isFree = book.free || book.price === 0;
     let started = false;
-    onAuth(user => {
+
+    function showLocked() {
+        msg.innerHTML = `<p>🔒 Yeh paid ebook hai. Padhne ke liye khareedein ya 3-din free trial lein.</p>
+            <div class="btn-row" style="justify-content:center">
+                <a class="buy-btn" href="${book.razorpayLink || '#'}" target="_blank" rel="noopener">Khareedein — ₹${book.price}</a>
+                <button type="button" class="buy-btn secondary" id="readerTrial">🎁 3-Din Free Trial</button>
+            </div>
+            <p class="login-note"><a class="back-link" href="${encodeURIComponent(book.id)}.html">← Book page par jaayein</a></p>`;
+        const tb = document.getElementById("readerTrial");
+        if (tb) tb.addEventListener("click", () => window.startTrial && window.startTrial());
+    }
+
+    function evaluate(user) {
         if (!user) {
             if (started) { window.location.reload(); return; }
             msg.innerHTML = `<p>🔒 Is ebook ko padhne ke liye login zaroori hai.</p>
@@ -269,10 +342,19 @@ async function initReader() {
             document.getElementById("readerLogin").addEventListener("click", () => requireLogin());
             return;
         }
+        if (!isFree && !(window.ebookSub && window.ebookSub.active)) {
+            if (started) { window.location.reload(); return; }
+            // Wait for the subscription listener's first result before deciding "locked".
+            if (window.ebookSub && window.ebookSub.ready) showLocked();
+            return;
+        }
         if (started) return;
         started = true;
         loadReader(book, user, msg, wrap, bar);
-    });
+    }
+
+    onAuth(evaluate);
+    window.addEventListener("ebook-sub", () => evaluate(window.ebookAuth && window.ebookAuth.user));
 }
 
 async function loadReader(book, user, msg, wrap, bar) {

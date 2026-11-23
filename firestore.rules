@@ -1,0 +1,25 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Each user can read their own subscription status, but only Cloud
+    // Functions (the Admin SDK, which bypasses these rules) may write it —
+    // so a user can never fake an active subscription from the browser.
+    match /users/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    // Subscription records are internal (uid <-> Razorpay subscription id
+    // mapping) and are only ever touched by Cloud Functions.
+    match /subscriptions/{subId} {
+      allow read, write: if false;
+    }
+
+    // Default deny everything else.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

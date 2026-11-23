@@ -88,3 +88,11 @@ nav.categories button:hover{transform:translateY(-2px) scale(1.06)}
 .grid .card:nth-child(22){animation-delay:0.6s}
 .grid .card:nth-child(23){animation-delay:0.6s}
 .grid .card:nth-child(24){animation-delay:0.6s}
+
+/* --- 3-day trial / subscription UI --- */
+.trial-note{margin:10px 0 0;font-size:.92rem;color:var(--muted)}
+.link-btn{background:none;border:0;padding:0;margin:0;font:inherit;color:var(--accent-dark);font-weight:700;text-decoration:underline;cursor:pointer}
+.link-btn:hover{color:var(--on-accent)}
+.sub-banner{background:#0b1f10;color:var(--accent);border-radius:12px;padding:16px 20px;margin:0 0 18px;box-shadow:0 0 0 2px var(--accent),var(--glow);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.sub-banner p{margin:0;font-weight:600}
+.sub-banner .buy-btn{padding:9px 20px;font-size:.95rem}
