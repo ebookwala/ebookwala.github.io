@@ -42,6 +42,21 @@ async function loadBooks() {
     ALL_BOOKS = await res.json();
     renderCategories();
     renderGrid(ALL_BOOKS);
+    buildHeroMosaic();
+}
+
+// Fills the home page's hero background with a tiled mosaic of real book covers.
+function buildHeroMosaic() {
+    const mosaic = document.getElementById("heroMosaic");
+    if (!mosaic || !ALL_BOOKS.length) return;
+    const covers = ALL_BOOKS.map(b => b.cover).filter(Boolean);
+    // Repeat/shuffle the cover list so the mosaic fills a wide strip even with few books.
+    const tiles = [];
+    const shuffled = [...covers].sort(() => Math.random() - 0.5);
+    while (tiles.length < 48) tiles.push(...shuffled);
+    mosaic.innerHTML = tiles.slice(0, 48).map((src, i) =>
+        `<img src="${src}" alt="" loading="lazy" style="animation-delay:${Math.min(i * 0.02, 0.6)}s">`
+    ).join("");
 }
 
 function renderCategories() {
