@@ -8,26 +8,25 @@ Code already likh diya gaya hai. Neeche diye steps **sirf aapko** (Vishnu ko)
 apne Razorpay aur Firebase dashboard mein karne hain — yeh main nahi kar
 sakta kyunki yeh aapke payment account ki settings hain.
 
-## 1. Razorpay dashboard mein Subscriptions activate karna
+## 1. Razorpay dashboard mein Subscriptions activate karna — DONE ✅
 
-1. https://dashboard.razorpay.com par login karein.
-2. **Subscriptions** feature activate hai ya nahi check karein — left menu
-   mein "Subscriptions" dikhna chahiye. Agar nahi dikhta, to Razorpay support
-   se activate karwana padega (Individual account par kabhi extra KYC maang
-   sakte hain).
-3. **Settings → Subscriptions → Authentication transaction amount** mein
-   jaakar amount **₹2** set karein — yahi woh rakam hai jo trial start karte
-   waqt deduct hogi (mandate verify karne ke liye).
-4. **UPI Autopay** aur **Card recurring** dono enable rakhein, taaki customer
-   dono tarah se pay kar sake.
+1. Subscriptions feature already active hai is account par.
+2. **UPI Autopay**, **Card Recurring** aur **eMandate** teeno already enabled
+   hain (Subscriptions → Settings mein check kiya gaya).
+3. Razorpay mein koi standalone "Authentication transaction amount" dashboard
+   setting nahi hoti — ₹2 ka trial charge ab seedha code mein set hai
+   (`functions/index.js` mein `addons` ke through, future `start_at` ke saath
+   combine hoke): isse pehla charge exactly ₹2 hoga, non-refundable, aur baaki
+   ₹49/month 3 din baad apne aap shuru hoga. Yeh step ab karne ki zaroorat
+   nahi hai.
 
-## 2. Plan banana (₹49/month)
+## 2. Plan banana (₹49/month) — DONE ✅
 
-1. Subscriptions → **Plans → + Create Plan**
-2. Billing frequency: **Monthly**, Amount: **₹49**, Currency: INR
-3. Plan ka naam: "ebookwala All-Access Monthly"
-4. Save karne ke baad jo **Plan ID** milega (jaise `plan_XXXXXXXXXXXX`), use
-   copy kar lein — step 5 mein chahiye hoga.
+Plan **"prouse"** (ebookwala All-Access Monthly) Razorpay Dashboard se bana
+diya gaya hai, ₹49/month.
+
+**Plan ID: `plan_U3kGjNk2UolgvW`** — yahi value step 5 mein
+`RAZORPAY_PLAN_ID` secret ke roop mein daalni hai.
 
 ## 3. Webhook banana
 

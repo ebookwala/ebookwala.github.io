@@ -117,6 +117,18 @@ exports.createTrialSubscription = onCall(
         customer_notify: 1,
         total_count: 120, // up to 10 years of monthly cycles; cancellable anytime
         start_at: startAt,
+        // Future start_at + an addon (upfront) amount makes the authentication
+        // charge equal to the addon amount itself (not an auto-refunded ₹5
+        // token charge). This is the real, non-refunded ₹2 trial fee.
+        addons: [
+          {
+            item: {
+              name: "3-Din Free Trial",
+              amount: 200, // ₹2 in paise
+              currency: "INR",
+            },
+          },
+        ],
         notes: { firebaseUid: uid },
       });
     } catch (err) {
