@@ -1,0 +1,58 @@
+name: Build ebookwala Android app
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'android-app/**'
+      - '.github/workflows/build-apk.yml'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+defaults:
+  run:
+    working-directory: android-app
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      - name: Build debug APK
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Rename APK for a stable download link
+        run: cp app/build/outputs/apk/debug/*.apk app/build/outputs/apk/debug/ebookwala.apk
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ebookwala-apk
+          path: android-app/app/build/outputs/apk/debug/ebookwala.apk
+
+      - name: Publish as a GitHub Release (stable public download link)
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: app-build-${{ github.run_number }}
+          name: ebookwala app build ${{ github.run_number }}
+          body: Automated build from commit ${{ github.sha }}. Download ebookwala.apk below and install it on an Android phone (allow "install from unknown sources" the first time).
+          files: android-app/app/build/outputs/apk/debug/ebookwala.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

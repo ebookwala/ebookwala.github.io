@@ -1,0 +1,12 @@
+<resources>
+    <color name="brand_green">#2C7A4B</color>
+    <color name="brand_green_dark">#1E5A36</color>
+    <color name="brand_accent">#FFC107</color>
+    <color name="background">#F5F7F6</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="text_primary">#1A1A1A</color>
+    <color name="text_secondary">#6B6B6B</color>
+    <color name="free_badge_bg">#2C7A4B</color>
+    <color name="price_badge_bg">#8E44AD</color>
+    <color name="white">#FFFFFF</color>
+</resources>
