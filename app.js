@@ -323,3 +323,36 @@ async function loadReader(book, user, msg, wrap, bar) {
         msg.textContent = "Ebook khul nahi paayi: " + err.message;
     }
 }
+
+// ---------- 3D tilt interaction (cards + book cover) ----------
+(function () {
+    // Skip on touch devices — mousemove won't fire meaningfully there anyway.
+    if (window.matchMedia && !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+
+    function tilt(el, e, strength, extra) {
+        const r = el.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width;
+        const y = (e.clientY - r.top) / r.height;
+        const rx = (0.5 - y) * strength;
+        const ry = (x - 0.5) * strength;
+        el.style.transition = "none";
+        el.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) ${extra}`;
+    }
+    function resetTilt(el) {
+        el.style.transition = "transform .45s ease";
+        el.style.transform = "";
+    }
+
+    document.addEventListener("mousemove", e => {
+        const card = e.target.closest && e.target.closest(".card");
+        if (card) tilt(card, e, 9, "translateY(-4px) scale(1.03)");
+        const cover = e.target.closest && e.target.closest(".book-detail img");
+        if (cover) tilt(cover, e, 12, "scale(1.04)");
+    });
+    document.addEventListener("mouseout", e => {
+        const card = e.target.closest && e.target.closest(".card");
+        if (card && (!e.relatedTarget || !card.contains(e.relatedTarget))) resetTilt(card);
+        const cover = e.target.closest && e.target.closest(".book-detail img");
+        if (cover && (!e.relatedTarget || !cover.contains(e.relatedTarget))) resetTilt(cover);
+    });
+})();
