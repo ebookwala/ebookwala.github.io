@@ -202,5 +202,18 @@
     "razorpayLink": "",
     "free": false,
     "file": "gemini-encyclopedia-volume-2.pdf"
+  },
+  {
+    "id": "gemini-encyclopedia-volume-3",
+    "title": "Gemini Encyclopedia Volume 3",
+    "author": "MyeKitab",
+    "category": "AI Tech",
+    "price": 99,
+    "cover": "covers/gemini-encyclopedia-volume-3.png",
+    "description": "Google Gemini par vistrit sandarbh granth ka teesra khand (adhyay 1201-2160) — Developer Foundations, Prompt Engineering, Gemini Advanced (Pro/Ultra), Gemini Canvas, Video Generation (Veo), Image Generation (Imagen), Workspace Integration, Gemini for Developers, Agents & Automation aur real-world projects/case studies tak. Har adhyay mein vyavharik nirman prakriya, udaharan brief aur abhyas diye gaye hain.",
+    "preview": "आवश्यक इनपुट, स्वीकृत आउटपुट, विफलता की स्थिति और डेटा-अधिकार पहले लिखें। समस्या निर्धारण: कौन-सा निर्णय मॉडल लेगा और कौन-सा निर्णय निश्चित कोड या व्यक्ति लेगा, अलग करें। न्यूनतम परीक्षण: तीन सामान्य, दो अस्पष्ट और दो त्रुटिपूर्ण इनपुट बनाएं।",
+    "razorpayLink": "",
+    "free": false,
+    "file": "gemini-encyclopedia-volume-3.pdf"
   }
 ]
