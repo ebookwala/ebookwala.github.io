@@ -227,5 +227,18 @@
     "preview": "Gemini Encyclopedia ke teeno volumes ek saath: Volume 1 (Gemini ki buniyaad, prompting, Canvas, Gems, Deep Research, Workspace), Volume 2 (AI Image Generation, Gemini Live, Apps & Extensions) aur Volume 3 (Developer Foundations, Advanced features, Veo, Imagen, Agents & Automation).",
     "razorpayLink": "",
     "free": false
+  },
+  {
+    "id": "surya-mahavigyan",
+    "title": "सूर्य महाविज्ञान",
+    "author": "JyotishVidhya",
+    "category": "Jyotish",
+    "price": 199,
+    "cover": "covers/surya-mahavigyan.png",
+    "description": "वैदिक ज्योतिष का अद्वितीय महाशोध ग्रंथ — जन्मकुंडली में सूर्य के संपूर्ण रहस्य (कुल 3500 पृष्ठ)। ऋग्वेद, यजुर्वेद, सामवेद, अथर्ववेद, बृहत्पाराशर होराशास्त्र, बृहज्जातक, फलदीपिका और सारावली जैसे शास्त्रीय ग्रंथों के प्रमाण के साथ सूर्य का सम्पूर्ण अध्ययन। 12 भावों में सूर्य का विस्तृत फल, 8 ग्रहों के साथ तथा दो से अधिक ग्रहों के साथ युति-फल, सूर्य से बनने वाले राजयोग व धनयोग, सूर्य की महादशा-अंतर्दशा व गोचर, सूर्य को सक्रिय व सुदृढ़ करने के उपाय, वैदिक मंत्र-स्तोत्र एवं उपासना विधि, तथा 200 सफल (मजबूत सूर्य) एवं 200 संघर्षग्रस्त (कमजोर सूर्य) व्यक्तियों की कुंडलियों का अध्ययन।",
+    "preview": "सूर्य आत्मा, पिता, नेतृत्व, सरकारी कार्य एवं आत्मविश्वास का कारक है। जन्मकुंडली में सूर्य की स्थिति व्यक्तित्व, करियर, स्वास्थ्य एवं पारिवारिक संबंधों को गहराई से प्रभावित करती है...",
+    "razorpayLink": "",
+    "free": false,
+    "file": "surya-mahavigyan.pdf"
   }
 ]
