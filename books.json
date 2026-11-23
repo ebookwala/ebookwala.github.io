@@ -215,5 +215,17 @@
     "razorpayLink": "",
     "free": false,
     "file": "gemini-encyclopedia-volume-3.pdf"
+  },
+  {
+    "id": "gemini-encyclopedia-combo",
+    "title": "Gemini Encyclopedia Combo (Volume 1-3)",
+    "author": "MyeKitab",
+    "category": "AI Tech",
+    "price": 249,
+    "cover": "covers/gemini-encyclopedia-volume-1.png",
+    "description": "Combo offer: Gemini Encyclopedia ke teeno volume (1, 2 aur 3) ek saath sirf ₹249 mein, alag-alag kharidne par ₹297 lagte. Adhyay 1-2160 tak — Gemini ki buniyaad aur prompting se lekar AI Image Generation, Gemini Live, Canvas, Deep Research, Workspace Integration, Developer Foundations, Agents & Automation aur real-world case studies tak ka poora safar.",
+    "preview": "Gemini Encyclopedia ke teeno volumes ek saath: Volume 1 (Gemini ki buniyaad, prompting, Canvas, Gems, Deep Research, Workspace), Volume 2 (AI Image Generation, Gemini Live, Apps & Extensions) aur Volume 3 (Developer Foundations, Advanced features, Veo, Imagen, Agents & Automation).",
+    "razorpayLink": "",
+    "free": false
   }
 ]
