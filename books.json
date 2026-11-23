@@ -189,5 +189,18 @@
     "razorpayLink": "",
     "free": false,
     "file": "gemini-encyclopedia-volume-1.pdf"
+  },
+  {
+    "id": "gemini-encyclopedia-volume-2",
+    "title": "Gemini Encyclopedia Volume 2",
+    "author": "MyeKitab",
+    "category": "AI Tech",
+    "price": 99,
+    "cover": "covers/gemini-encyclopedia-volume-2.png",
+    "description": "Google Gemini par vistrit sandarbh granth ka doosra khand (adhyay 601-1200) — AI Image Generation, Gemini Live (Voice AI), Gemini Canvas, Deep Research, Workspace Integration, Gemini for Code, Data Analysis, Apps & Extensions aur real projects/case studies tak. Har adhyay mein prompt template, self-evaluation aur step-by-step abhyas diye gaye hain.",
+    "preview": "विषय: [मुख्य विषय] | कार्य: AI Image Generation का परिचय | दर्शक: [लक्षित समूह] | शैली: [विशिष्ट दृश्य भाषा] | अनुपात: [9:16/16:9/1:1] | अनिवार्य विवरण: [सूची] | वर्जित विवरण: [सूची] | गुणवत्ता समीक्षा: [जाँच मानदंड]।",
+    "razorpayLink": "",
+    "free": false,
+    "file": "gemini-encyclopedia-volume-2.pdf"
   }
 ]
