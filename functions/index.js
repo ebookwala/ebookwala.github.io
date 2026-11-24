@@ -95,15 +95,29 @@ exports.createTrialSubscription = onCall(
         });
         customerId = customer.id;
       } catch (err) {
-        // Razorpay errors if a customer with this email already exists; fetch it instead.
-        if (err && err.error && err.error.code === "BAD_REQUEST_ERROR" && email) {
-          const list = await rp.customers.all({ count: 100 });
-          const found = (list.items || []).find((c) => c.email === email);
-          if (found) customerId = found.id;
+        // Razorpay returns BAD_REQUEST_ERROR both for "customer already exists"
+        // AND for bad API credentials — only try the fallback lookup for the
+        // former, and never let the fallback's own failure go unhandled.
+        const description = (err && err.error && err.error.description) || "";
+        const looksLikeDuplicate = /already exists/i.test(description);
+        if (err && err.error && err.error.code === "BAD_REQUEST_ERROR" && email && looksLikeDuplicate) {
+          try {
+            const list = await rp.customers.all({ count: 100 });
+            const found = (list.items || []).find((c) => c.email === email);
+            if (found) customerId = found.id;
+          } catch (lookupErr) {
+            logger.error("Razorpay customer lookup (duplicate fallback) failed", lookupErr);
+          }
         }
         if (!customerId) {
           logger.error("Razorpay customer creation failed", err);
-          throw new HttpsError("internal", "Razorpay customer nahi ban paaya.");
+          const authFailed = err && err.error && /authentication failed/i.test(err.error.description || "");
+          throw new HttpsError(
+            "internal",
+            authFailed
+              ? "Razorpay API keys galat hain ya match nahi kar rahi (Authentication failed)."
+              : "Razorpay customer nahi ban paaya."
+          );
         }
       }
     }
