@@ -4,11 +4,13 @@
  * Implements: "3-Din Free Trial" (₹2 authorization) then
  * ₹49/month autodebit via Razorpay Subscriptions.
  *
- * Three functions:
+ * Four functions:
  *  - createTrialSubscription  (callable)  → starts a Razorpay subscription
  *                                            for the logged-in user
+ *  - createBookOrder          (callable)  → creates a Razorpay Order to buy
+ *                                            one paid ebook
  *  - razorpayWebhook          (HTTP)      → Razorpay calls this on every
- *                                            subscription/payment event
+ *                                            subscription/payment/order event
  *  - cancelSubscription       (callable)  → lets a user cancel their own
  *                                            subscription
  *
@@ -178,7 +180,8 @@ exports.createTrialSubscription = onCall(
 /**
  * Razorpay webhook. Configure this URL (printed after `firebase deploy`) in
  * Razorpay Dashboard → Settings → Webhooks, subscribed to the
- * subscription.* events, with the same secret as RAZORPAY_WEBHOOK_SECRET.
+ * subscription.* events AND order.paid, with the same secret as
+ * RAZORPAY_WEBHOOK_SECRET.
  */
 exports.razorpayWebhook = onRequest(
   { region: REGION, secrets: [RAZORPAY_WEBHOOK_SECRET] },
@@ -204,6 +207,27 @@ exports.razorpayWebhook = onRequest(
 
     const event = req.body && req.body.event;
     const payload = (req.body && req.body.payload) || {};
+
+    // One-time book purchase: a book's Razorpay Order, paid in full via
+    // Razorpay Checkout, tagged with notes.firebaseUid + notes.bookId at
+    // creation time (see createBookOrder below). Unlocks just that one book.
+    const orderEntity = payload.order && payload.order.entity;
+    if (event === "order.paid" && orderEntity) {
+      const buyerUid = orderEntity.notes && orderEntity.notes.firebaseUid;
+      const bookId = orderEntity.notes && orderEntity.notes.bookId;
+      if (buyerUid && bookId) {
+        await db.collection("users").doc(buyerUid).set(
+          { purchasedBooks: admin.firestore.FieldValue.arrayUnion(bookId) },
+          { merge: true }
+        );
+        logger.info("Book purchase unlocked", { uid: buyerUid, bookId, orderId: orderEntity.id });
+      } else {
+        logger.warn("order.paid webhook missing notes", { orderId: orderEntity.id });
+      }
+      res.status(200).send("ok");
+      return;
+    }
+
     const subEntity = payload.subscription && payload.subscription.entity;
 
     if (!subEntity) {
@@ -282,5 +306,59 @@ exports.cancelSubscription = onCall(
       throw new HttpsError("internal", "Cancel nahi ho paaya.");
     }
     return { ok: true };
+  }
+);
+
+/**
+ * Called from the site once a logged-in user clicks "Khareedein" on a paid
+ * ebook that has a readable file. Creates a Razorpay Order for that one
+ * book, with the price looked up server-side from books.json (never
+ * trusted from the client), tagged with notes so razorpayWebhook can
+ * unlock just that book once the order.paid event arrives.
+ */
+exports.createBookOrder = onCall(
+  { region: REGION, secrets: [RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET] },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "Login zaroori hai.");
+    }
+    const uid = request.auth.uid;
+    const bookId = request.data && request.data.bookId;
+    if (!bookId) {
+      throw new HttpsError("invalid-argument", "bookId zaroori hai.");
+    }
+
+    let books;
+    try {
+      const booksRes = await fetch("https://ebookwala.github.io/books.json");
+      books = await booksRes.json();
+    } catch (err) {
+      logger.error("Fetching books.json failed", err);
+      throw new HttpsError("internal", "Ebook list load nahi ho paayi.");
+    }
+    const book = books.find((b) => b.id === bookId);
+    if (!book || book.free || !book.price) {
+      throw new HttpsError("not-found", "Ye ebook khareedne ke liye available nahi hai.");
+    }
+
+    const rp = razorpayClient();
+    let order;
+    try {
+      order = await rp.orders.create({
+        amount: Math.round(book.price * 100),
+        currency: "INR",
+        notes: { firebaseUid: uid, bookId },
+      });
+    } catch (err) {
+      logger.error("Razorpay order creation failed", err);
+      throw new HttpsError("internal", "Order nahi ban paaya.");
+    }
+
+    return {
+      orderId: order.id,
+      amount: order.amount,
+      keyId: RAZORPAY_KEY_ID.value(),
+      title: book.title,
+    };
   }
 );
