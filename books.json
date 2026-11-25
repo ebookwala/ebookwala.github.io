@@ -182,5 +182,31 @@
     "razorpayLink": "https://rzp.io/rzp/tmlEs0U",
     "free": false,
     "file": "surya-mahavigyan.pdf"
+  },
+  {
+    "id": "youtube-se-bane-crorepati",
+    "title": "YouTube Se Bane Crorepati",
+    "author": "MyeKitab",
+    "category": "Self-Help",
+    "price": 39,
+    "cover": "covers/youtube-se-bane-crorepati.png",
+    "description": "YouTube par naye aur badhte Hindi creator ke liye channel shuru karne se lekar alag-alag aay strot banane tak ki kramabaddh yojana — behtar video, badhte darshak, kamai ke strot aur lambe samay ka channel banane ki vyavharik guide.",
+    "preview": "Drishya ka arth kisi video ko dekha jaana hai; ek drishya grahak ya bhugtan nahi hai. Impression ke zariye video ka shirshak aur thumbnail kisi screen par dikhne ka sanket milta hai. Aay ya rajasva bikri aur bhugtan ki kul rakam hai...",
+    "razorpayLink": "",
+    "free": false,
+    "file": "youtube-se-bane-crorepati.pdf"
+  },
+  {
+    "id": "mobile-se-online-kamai",
+    "title": "Mobile Se Online Kamai",
+    "author": "MyeKitab",
+    "category": "Self-Help",
+    "price": 99,
+    "cover": "covers/mobile-se-online-kamai.png",
+    "description": "Mobile se seva, samagri aur digital utpad banane ke 100 alag tareeke, shuruaati star se samjhaye gaye — har adhyay mein kaam ki seema, namuna, grahak se baatcheet, mulya tay karna aur suraksha ka abhyas.",
+    "preview": "Yeh pustak mobile se seva, samagri aur digital utpad banane ke sau alag tareekon ko shuruaati star se samjhati hai. Har adhyay kaam ki seema, namuna, grahak se baatcheet, mulya tay karne aur suraksha ka abhyas deta hai...",
+    "razorpayLink": "",
+    "free": false,
+    "file": "mobile-se-online-kamai.pdf"
   }
 ]
