@@ -2,4 +2,7 @@
 plugins {
     id 'com.android.application' version '8.7.3' apply false
     id 'org.jetbrains.kotlin.android' version '1.9.24' apply false
+    // Only takes effect in app/build.gradle once app/google-services.json
+    // exists (push notifications setup) — safe to keep declared either way.
+    id 'com.google.gms.google-services' version '4.4.2' apply false
 }

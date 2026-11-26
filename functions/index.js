@@ -557,6 +557,32 @@ exports.notifyNewBooks = onRequest(
       }
     }
 
+    // Also push an FCM topic notification to the Android app (every install
+    // that has the app open subscribes itself to the "new_books" topic — see
+    // android-app/.../NotificationHelper.kt). This is best-effort: if the
+    // Android app isn't registered with this Firebase project yet, or FCM
+    // isn't set up, this just logs and the email notification above still
+    // goes out normally.
+    try {
+      await admin.messaging().send({
+        topic: "new_books",
+        notification: {
+          title: subject,
+          body: books.length === 1
+            ? `${books[0].title} ab ebookwala app mein padhein!`
+            : `${books.length} nayi ebooks ab ebookwala app mein padhein!`,
+        },
+        data: {
+          type: "new_books",
+          bookIds: books.map((b) => b.id).join(","),
+        },
+        android: { notification: { channelId: "new_books" } },
+      });
+      logger.info("notifyNewBooks: FCM topic push sent");
+    } catch (err) {
+      logger.warn("notifyNewBooks: FCM push skipped/failed", err.message);
+    }
+
     logger.info("notifyNewBooks sent", { books: books.map((b) => b.id), recipients: sent });
     res.status(200).send(`Notified ${sent} of ${emails.length} users`);
   }

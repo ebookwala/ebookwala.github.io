@@ -1,13 +1,18 @@
 package com.ebookwala.app
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import com.ebookwala.app.databinding.ActivityMainBinding
 import java.util.concurrent.Executors
@@ -23,12 +28,26 @@ class MainActivity : AppCompatActivity() {
     private var currentCategory: String = "Sabhi"
     private var currentQuery: String = ""
 
+    private val notificationPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { /* no-op either way */ }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         repository = BooksRepository(this)
+
+        // New-book / offer push alerts: subscribe this install to the
+        // shared "new_books" topic (no login needed) and, on Android 13+,
+        // ask once for notification permission.
+        NotificationHelper.subscribeToNewBookAlerts(this)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
 
         binding.recyclerBooks.layoutManager = GridLayoutManager(this, 2)
         binding.recyclerBooks.adapter = adapter

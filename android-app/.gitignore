@@ -9,3 +9,5 @@
 .cxx
 *.apk
 *.aab
+# Written by CI from the GOOGLE_SERVICES_JSON secret; never commit a real one.
+app/google-services.json
