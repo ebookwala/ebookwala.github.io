@@ -363,5 +363,18 @@
         "razorpayLink": "https://rzp.io/rzp/gIDp5jq6",
         "free": false,
         "file": "gobar-se-kamai-ke-50-tarike.pdf"
+    },
+    {
+        "id": "chatgpt-se-online-kamai-technology",
+        "title": "ChatGPT से ऑनलाइन कमाई टेक्नोलॉजी",
+        "author": "MyeKitab",
+        "category": "AI Tech",
+        "price": 49,
+        "cover": "covers/chatgpt-se-online-kamai-technology.png",
+        "description": "ChatGPT की मदद से ऑनलाइन कमाई के 36 व्यावहारिक तरीके और संपादित कार्य उदाहरण: लेखन व स्थानीय व्यवसाय सेवाएँ, वीडियो-ऑडियो व प्रस्तुति, शिक्षा व ज्ञान उत्पाद, ग्राहक सेवा व संचालन, वेबसाइट-तकनीक व डिजिटल उत्पाद। हर तरीके में नमूना इनपुट, संपादित कार्य उदाहरण, पहला व सुधरा मसौदा तथा डिलिवरेबल का पैकेट दिया गया है।",
+        "preview": "इस पुस्तक में ChatGPT से तैयार की जाने वाली 36 सेवाएँ हैं — ब्लॉग लेखन, वेबसाइट कॉपी, यूट्यूब स्क्रिप्ट, माइक्रो कोर्स, ग्राहक सहायता उत्तर, लैंडिंग पेज, चैटबॉट सामग्री, टेम्पलेट पैक जैसी सेवाओं को तैयार कर ग्राहक को कैसे पेश करें, इसकी पूरी प्रक्रिया नमूना इनपुट-आउटपुट सहित।",
+        "razorpayLink": "",
+        "free": false,
+        "file": "chatgpt-se-online-kamai-technology.pdf"
     }
 ]
