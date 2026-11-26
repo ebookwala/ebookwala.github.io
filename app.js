@@ -141,7 +141,7 @@ function cardActionsHtml(b) {
         if (!b.file) return `<a class="mini-btn" href="${href}">Vivaran Dekhein</a>`;
         return `<button type="button" class="mini-btn" data-action="free-read" data-id="${b.id}">📖 Free Padhein</button>`;
     }
-    const buyLabel = (type === "combo" ? "🎁 " : "") + "₹" + b.price + " mein Khareedein";
+    const buyLabel = (type === "combo" ? "🎁 " : "") + "₹" + b.price + " Khareedein";
     return `
         <a class="mini-btn ghost" href="${href}#previewBox">Namuna Padhein</a>
         <button type="button" class="mini-btn" data-action="buy" data-id="${b.id}" data-price="${b.price}" data-title="${encodeURIComponent(b.title)}">${buyLabel}</button>`;
