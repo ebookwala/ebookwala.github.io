@@ -376,5 +376,18 @@
         "razorpayLink": "https://rzp.io/rzp/HAdr9sQm",
         "free": false,
         "file": "chatgpt-se-online-kamai-technology.pdf"
+    },
+    {
+        "id": "paneer-encyclopedia-volume-1",
+        "title": "पनीर पाक कला का संपूर्ण विश्वकोश — Volume 1",
+        "author": "MyeKitab",
+        "category": "Cooking",
+        "price": 49,
+        "cover": "covers/paneer-encyclopedia-volume-1.png",
+        "description": "The Great Indian Paneer Encyclopedia, खंड 1: क्लासिक और शाही ग्रेवी रेसिपीज़ (रेसिपी 1 से 10) — शाही पनीर, पनीर बटर मसाला, कढ़ाई पनीर, मटर पनीर, पालक पनीर, पनीर लबाबदार, पनीर दो प्याज़ा, पनीर कोल्हापुरी, पनीर पसंदा और पनीर मखनी। हर रेसिपी में सामग्री सूची, पोषण व समय विश्लेषण चार्ट, पूर्व-तैयारी के चरण, मास्टर शेफ़ के टिप्स, वेरिएशन्स और स्टोरेज विधि सहित 4 विस्तृत पृष्ठ।",
+        "preview": "भारत की सबसे प्रतिष्ठित पनीर ग्रेवी रेसिपीज़ — शाही पनीर, पनीर बटर मसाला, कढ़ाई पनीर, मटर पनीर, पालक पनीर और अन्य — हर एक में सटीक मात्रा, चरण-दर-चरण विधि, शेफ़ के खास टिप्स और परोसने के सुझाव। 3D सांकेतिक व्यंजन चित्रों सहित।",
+        "razorpayLink": "",
+        "free": false,
+        "file": "paneer-encyclopedia-volume-1.pdf"
     }
 ]
