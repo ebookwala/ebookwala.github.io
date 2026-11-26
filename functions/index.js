@@ -2,9 +2,12 @@
  * ebookwala — subscription Cloud Functions
  * --------------------------------------------------------
  * Implements: "3-Din Free Trial" (₹2 authorization) then
- * ₹49/month autodebit via Razorpay Subscriptions.
+ * ₹49/month autodebit via Razorpay Subscriptions, plus a mandatory
+ * profile (mobile/WhatsApp/age/profession) collected after login, an
+ * owner-only admin listing of that data, and an email notification sent
+ * to every logged-in user whenever a new ebook is added to books.json.
  *
- * Four functions:
+ * Functions:
  *  - createTrialSubscription  (callable)  → starts a Razorpay subscription
  *                                            for the logged-in user
  *  - createBookOrder          (callable)  → creates a Razorpay Order to buy
@@ -13,12 +16,28 @@
  *                                            subscription/payment/order event
  *  - cancelSubscription       (callable)  → lets a user cancel their own
  *                                            subscription
+ *  - saveProfile              (callable)  → saves/updates the logged-in
+ *                                            user's mobile/WhatsApp/age/
+ *                                            profession (mandatory gate +
+ *                                            the account page's edit form)
+ *  - adminListUsers           (callable)  → returns every user's profile +
+ *                                            subscription summary; only
+ *                                            the ADMIN_EMAIL account may
+ *                                            call this
+ *  - notifyNewBooks           (HTTP)      → emails every logged-in user
+ *                                            about newly added ebooks;
+ *                                            called by the GitHub Action
+ *                                            that diffs books.json on push
  *
  * Required secrets (set once via `firebase functions:secrets:set NAME`):
  *   RAZORPAY_KEY_ID
  *   RAZORPAY_KEY_SECRET
  *   RAZORPAY_WEBHOOK_SECRET
  *   RAZORPAY_PLAN_ID
+ *   GMAIL_USER             — the Gmail address notification emails are sent from
+ *   GMAIL_APP_PASSWORD     — a 16-char Gmail "App Password" (not the normal password)
+ *   NOTIFY_SECRET          — a random string shared with the GitHub Action
+ *   ADMIN_EMAIL            — the Google account allowed to open admin.html
  *
  * See functions/README.md for the one-time setup steps.
  */
@@ -29,6 +48,7 @@ const logger = require("firebase-functions/logger");
 const admin = require("firebase-admin");
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
+const nodemailer = require("nodemailer");
 
 admin.initializeApp();
 const db = admin.firestore();
@@ -39,6 +59,10 @@ const RAZORPAY_KEY_ID = defineSecret("RAZORPAY_KEY_ID");
 const RAZORPAY_KEY_SECRET = defineSecret("RAZORPAY_KEY_SECRET");
 const RAZORPAY_WEBHOOK_SECRET = defineSecret("RAZORPAY_WEBHOOK_SECRET");
 const RAZORPAY_PLAN_ID = defineSecret("RAZORPAY_PLAN_ID");
+const GMAIL_USER = defineSecret("GMAIL_USER");
+const GMAIL_APP_PASSWORD = defineSecret("GMAIL_APP_PASSWORD");
+const NOTIFY_SECRET = defineSecret("NOTIFY_SECRET");
+const ADMIN_EMAIL = defineSecret("ADMIN_EMAIL");
 
 // Subscription statuses that should unlock reading access on the site.
 // "authenticated" = the ₹2 mandate/authorization succeeded and the 3-day
@@ -376,5 +400,164 @@ exports.createBookOrder = onCall(
       keyId: RAZORPAY_KEY_ID.value(),
       title: book.title,
     };
+  }
+);
+
+// ---------------------------------------------------------------------
+// Profile (mandatory mobile/WhatsApp/age/profession) + admin listing +
+// new-book email notifications.
+// ---------------------------------------------------------------------
+
+const MOBILE_RE = /^(\+91[\-\s]?)?[6-9]\d{9}$/; // Indian mobile, optional +91
+
+/**
+ * Called from the mandatory profile gate (right after first login) and
+ * from the "Mera Account" page's edit form. Validates and saves the four
+ * fields server-side — these show up in adminListUsers, so they're kept
+ * real rather than trusting whatever the client already displayed.
+ */
+exports.saveProfile = onCall({ region: REGION }, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "Login zaroori hai.");
+  }
+  const uid = request.auth.uid;
+  const data = request.data || {};
+  const mobile = String(data.mobile || "").trim().replace(/[\s-]/g, "");
+  const whatsappRaw = String(data.whatsapp || "").trim().replace(/[\s-]/g, "");
+  const whatsapp = whatsappRaw || mobile; // "same as mobile" when left blank
+  const age = Number(data.age);
+  const profession = String(data.profession || "").trim().slice(0, 80);
+
+  if (!MOBILE_RE.test(mobile)) {
+    throw new HttpsError("invalid-argument", "Sahi 10-digit mobile number dalein.");
+  }
+  if (!MOBILE_RE.test(whatsapp)) {
+    throw new HttpsError("invalid-argument", "Sahi 10-digit WhatsApp number dalein.");
+  }
+  if (!Number.isFinite(age) || age < 10 || age > 100) {
+    throw new HttpsError("invalid-argument", "Sahi age (10-100) dalein.");
+  }
+  if (!profession) {
+    throw new HttpsError("invalid-argument", "Profession zaroori hai.");
+  }
+
+  await db.collection("users").doc(uid).set(
+    {
+      email: request.auth.token.email || null,
+      displayName: request.auth.token.name || null,
+      mobile,
+      whatsapp,
+      age,
+      profession,
+      profileCompleted: true,
+      profileUpdatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    },
+    { merge: true }
+  );
+
+  return { ok: true };
+});
+
+/**
+ * Owner-only: lists every user's profile + subscription summary for the
+ * admin.html page. Gated purely by request.auth.token.email matching the
+ * ADMIN_EMAIL secret — the admin signs in with their own Google account,
+ * no separate password to manage.
+ */
+exports.adminListUsers = onCall({ region: REGION, secrets: [ADMIN_EMAIL] }, async (request) => {
+  const callerEmail = (request.auth && request.auth.token.email || "").toLowerCase();
+  const adminEmail = (ADMIN_EMAIL.value() || "").toLowerCase();
+  if (!callerEmail || !adminEmail || callerEmail !== adminEmail) {
+    throw new HttpsError("permission-denied", "Aap is page ko kholne ke liye authorized nahi hain.");
+  }
+
+  const snap = await db.collection("users").get();
+  const users = snap.docs.map((doc) => {
+    const d = doc.data() || {};
+    return {
+      uid: doc.id,
+      email: d.email || null,
+      displayName: d.displayName || null,
+      mobile: d.mobile || null,
+      whatsapp: d.whatsapp || null,
+      age: d.age || null,
+      profession: d.profession || null,
+      profileCompleted: !!d.profileCompleted,
+      subscriptionStatus: (d.subscription && d.subscription.status) || null,
+      purchasedBooksCount: (d.purchasedBooks || []).length,
+      trialUsed: !!d.trialUsed,
+    };
+  });
+  return { users };
+});
+
+/**
+ * Called by the GitHub Action (.github/workflows/notify-new-books.yml)
+ * whenever a push to main adds a new book to books.json. Emails every
+ * logged-in user (anyone with an `email` field in their users/{uid} doc,
+ * profile-completed or not) in BCC batches via Gmail SMTP.
+ */
+exports.notifyNewBooks = onRequest(
+  { region: REGION, secrets: [GMAIL_USER, GMAIL_APP_PASSWORD, NOTIFY_SECRET] },
+  async (req, res) => {
+    if (req.method !== "POST") {
+      res.status(405).send("POST only");
+      return;
+    }
+    const providedSecret = req.headers["x-notify-secret"];
+    if (!providedSecret || providedSecret !== NOTIFY_SECRET.value()) {
+      res.status(403).send("Invalid secret");
+      return;
+    }
+    const books = Array.isArray(req.body && req.body.books) ? req.body.books : [];
+    if (!books.length) {
+      res.status(200).send("No books to notify about");
+      return;
+    }
+
+    const snap = await db.collection("users").select("email").get();
+    const emails = [...new Set(snap.docs.map((d) => d.data().email).filter(Boolean))];
+    if (!emails.length) {
+      res.status(200).send("No subscribers to email");
+      return;
+    }
+
+    const siteUrl = "https://ebookwala.github.io/";
+    const listHtml = books
+      .map((b) => `<li><a href="${siteUrl}${encodeURIComponent(b.id)}.html">${b.title}</a></li>`)
+      .join("");
+    const listText = books.map((b) => `- ${b.title}: ${siteUrl}${encodeURIComponent(b.id)}.html`).join("\n");
+    const subject = books.length === 1
+      ? `📚 Nayi ebook aayi hai: ${books[0].title} — ebookwala`
+      : `📚 ${books.length} nayi ebooks aayi hain — ebookwala`;
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: { user: GMAIL_USER.value(), pass: GMAIL_APP_PASSWORD.value() },
+    });
+
+    // BCC in small batches — gentler on Gmail's sending limits/spam
+    // filters than one email with hundreds of recipients.
+    const BATCH_SIZE = 40;
+    let sent = 0;
+    for (let i = 0; i < emails.length; i += BATCH_SIZE) {
+      const batch = emails.slice(i, i + BATCH_SIZE);
+      try {
+        await transporter.sendMail({
+          from: `"ebookwala" <${GMAIL_USER.value()}>`,
+          to: GMAIL_USER.value(),
+          bcc: batch,
+          subject,
+          text: `ebookwala par nayi ebooks aayi hain:\n\n${listText}\n\nDekhein: ${siteUrl}`,
+          html: `<p>ebookwala par nayi ebooks aayi hain:</p><ul>${listHtml}</ul><p><a href="${siteUrl}">Sabhi ebooks dekhein →</a></p>`,
+        });
+        sent += batch.length;
+      } catch (err) {
+        logger.error("notifyNewBooks: batch send failed", err);
+      }
+    }
+
+    logger.info("notifyNewBooks sent", { books: books.map((b) => b.id), recipients: sent });
+    res.status(200).send(`Notified ${sent} of ${emails.length} users`);
   }
 );

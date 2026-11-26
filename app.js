@@ -54,7 +54,87 @@ function renderAuthBar(user) {
     }
 }
 
-function initAuthBar() { onAuth(renderAuthBar); }
+function initAuthBar() {
+    onAuth(renderAuthBar);
+    onAuth(updateProfileGate);
+    window.addEventListener("ebook-sub", () => updateProfileGate());
+}
+
+// ---------- Mandatory profile gate (mobile/WhatsApp/age/profession) ----------
+// Shown once, right after login, on every page (it's wired into
+// initAuthBar, which every page calls) until the user saves their details.
+const PROFESSION_SUGGESTIONS = ["Student", "Service", "Business", "Homemaker", "Freelancer", "Retired", "Other"];
+
+function buildProfileGateMarkup() {
+    const overlay = document.createElement("div");
+    overlay.id = "profileGateOverlay";
+    overlay.className = "profile-gate-overlay";
+    overlay.innerHTML = `
+        <div class="profile-gate-card">
+            <h2>📋 Apni Basic Details Bharein</h2>
+            <p>Login ke baad ek baar ye details bharni zaroori hain, taaki hum aapse sampark kar sakein.</p>
+            <form id="profileGateForm" class="profile-form">
+                <label>Mobile Number<input type="tel" id="pgMobile" placeholder="98765 43210" required></label>
+                <label class="pg-checkbox"><input type="checkbox" id="pgSameWhatsapp" checked> WhatsApp number mobile jaisa hi hai</label>
+                <label id="pgWhatsappRow" style="display:none">WhatsApp Number<input type="tel" id="pgWhatsapp" placeholder="98765 43210"></label>
+                <label>Age<input type="number" id="pgAge" min="10" max="100" placeholder="25" required></label>
+                <label>Profession<input type="text" id="pgProfession" list="pgProfessionList" placeholder="Student / Service / Business…" required></label>
+                <datalist id="pgProfessionList">${PROFESSION_SUGGESTIONS.map(p => `<option value="${p}">`).join("")}</datalist>
+                <p class="pg-error" id="pgError"></p>
+                <button type="submit" class="buy-btn" id="pgSubmitBtn">Save &amp; Continue</button>
+            </form>
+            <button type="button" class="link-btn" id="pgLogoutBtn">Login se logout karein</button>
+        </div>`;
+    document.body.appendChild(overlay);
+
+    const sameBox = overlay.querySelector("#pgSameWhatsapp");
+    const waRow = overlay.querySelector("#pgWhatsappRow");
+    sameBox.addEventListener("change", () => { waRow.style.display = sameBox.checked ? "none" : "block"; });
+
+    overlay.querySelector("#pgLogoutBtn").addEventListener("click", () => window.ebookAuth && window.ebookAuth.logout());
+
+    overlay.querySelector("#profileGateForm").addEventListener("submit", e => {
+        e.preventDefault();
+        const errEl = overlay.querySelector("#pgError");
+        const btn = overlay.querySelector("#pgSubmitBtn");
+        const fields = {
+            mobile: overlay.querySelector("#pgMobile").value,
+            whatsapp: sameBox.checked ? "" : overlay.querySelector("#pgWhatsapp").value,
+            age: overlay.querySelector("#pgAge").value,
+            profession: overlay.querySelector("#pgProfession").value,
+        };
+        errEl.textContent = "";
+        btn.disabled = true;
+        btn.textContent = "Save ho raha hai…";
+        (window.saveProfile ? window.saveProfile(fields) : Promise.reject(new Error("Abhi load ho raha hai, thodi der baad try karein.")))
+            .then(() => removeProfileGate())
+            .catch(err => {
+                errEl.textContent = "⚠️ " + ((err && err.message) || "Kuch galat ho gaya.");
+                btn.disabled = false;
+                btn.textContent = "Save & Continue";
+            });
+    });
+    return overlay;
+}
+
+function showProfileGate() {
+    if (document.getElementById("profileGateOverlay")) return;
+    buildProfileGateMarkup();
+}
+
+function removeProfileGate() {
+    const el = document.getElementById("profileGateOverlay");
+    if (el) el.remove();
+}
+
+function updateProfileGate() {
+    const user = window.ebookAuth && window.ebookAuth.user;
+    if (!user) { removeProfileGate(); return; }
+    const sub = window.ebookSub || {};
+    if (!sub.ready) return; // wait for the Firestore listener's first snapshot
+    if (sub.profileCompleted) { removeProfileGate(); return; }
+    showProfileGate();
+}
 
 // ---------- Catalog ----------
 const CATALOG_CACHE_KEY = "ebookwala:catalog-cache-v1";
@@ -700,6 +780,23 @@ async function initAccountPage() {
               }).join("")}</ul>`
             : `<p class="login-note">Abhi tak koi ebook individually khareedi nahi hai (subscription ke alawa).</p>`;
 
+        const esc = v => String(v == null ? "" : v).replace(/"/g, "&quot;");
+        const profile = sub.profile || {};
+        const profileHtml = `
+            <div class="account-card">
+                <h3>📋 Apni Details</h3>
+                <form id="acctProfileForm" class="profile-form">
+                    <label>Mobile Number<input type="tel" id="apMobile" value="${esc(profile.mobile)}" required></label>
+                    <label>WhatsApp Number<input type="tel" id="apWhatsapp" value="${esc(profile.whatsapp)}" required></label>
+                    <label>Age<input type="number" min="10" max="100" id="apAge" value="${esc(profile.age)}" required></label>
+                    <label>Profession<input type="text" id="apProfession" list="apProfessionList" value="${esc(profile.profession)}" required></label>
+                    <datalist id="apProfessionList">${PROFESSION_SUGGESTIONS.map(p => `<option value="${p}">`).join("")}</datalist>
+                    <p class="pg-error" id="apError"></p>
+                    <p class="pg-success" id="apSuccess"></p>
+                    <button type="submit" class="buy-btn secondary" id="apSaveBtn">Update Karein</button>
+                </form>
+            </div>`;
+
         box.innerHTML = `
             <div class="account-card account-header">
                 ${u.photoURL ? `<img src="${u.photoURL}" alt="" referrerpolicy="no-referrer">` : ""}
@@ -708,6 +805,7 @@ async function initAccountPage() {
                     <p class="login-note">${u.email || ""}</p>
                 </div>
             </div>
+            ${profileHtml}
             ${subHtml}
             <div class="account-card">
                 <h3>📚 Khareedi hui ebooks</h3>
@@ -718,11 +816,85 @@ async function initAccountPage() {
         if (cancelBtn) cancelBtn.addEventListener("click", () => window.cancelSubscription && window.cancelSubscription());
         const trialBtn = document.getElementById("acctTrialBtn");
         if (trialBtn) trialBtn.addEventListener("click", () => window.startTrial && window.startTrial());
+        const profForm = document.getElementById("acctProfileForm");
+        if (profForm) profForm.addEventListener("submit", e => {
+            e.preventDefault();
+            const errEl = document.getElementById("apError"), okEl = document.getElementById("apSuccess"), btn = document.getElementById("apSaveBtn");
+            errEl.textContent = ""; okEl.textContent = "";
+            btn.disabled = true; btn.textContent = "Save ho raha hai…";
+            const fields = {
+                mobile: document.getElementById("apMobile").value,
+                whatsapp: document.getElementById("apWhatsapp").value,
+                age: document.getElementById("apAge").value,
+                profession: document.getElementById("apProfession").value,
+            };
+            (window.saveProfile ? window.saveProfile(fields) : Promise.reject(new Error("Abhi load ho raha hai, thodi der baad try karein.")))
+                .then(() => { okEl.textContent = "✅ Update ho gaya."; })
+                .catch(err => { errEl.textContent = "⚠️ " + ((err && err.message) || "Save nahi hua."); })
+                .finally(() => { btn.disabled = false; btn.textContent = "Update Karein"; });
+        });
     }
 
     onAuth(render);
     window.addEventListener("ebook-sub", render);
     render();
+}
+
+// ---------- Admin page: every user's profile + subscription summary ----------
+async function initAdminPage() {
+    initAuthBar();
+    const box = document.getElementById("adminDetail");
+    if (!box) return;
+
+    function renderLoading() { box.innerHTML = `<div class="empty-state">Load ho raha hai…</div>`; }
+    function renderLoginPrompt() {
+        box.innerHTML = `<div class="empty-state">Ye page sirf admin ke liye hai. Apne Google account se login karein.<br>
+            <button type="button" class="buy-btn" id="adminLoginBtn" style="margin-top:14px">🔐 Google se Login</button></div>`;
+        const btn = document.getElementById("adminLoginBtn");
+        if (btn) btn.addEventListener("click", () => requireLogin().then(() => load()));
+    }
+    function renderDenied() {
+        box.innerHTML = `<div class="empty-state">🚫 Aap is page ko kholne ke liye authorized nahi hain.</div>`;
+    }
+    function renderUsers(users) {
+        if (!users.length) {
+            box.innerHTML = `<div class="empty-state">Abhi tak koi user nahi mila.</div>`;
+            return;
+        }
+        const rows = users.map(u => `
+            <tr>
+                <td>${u.displayName || "—"}</td>
+                <td>${u.email || "—"}</td>
+                <td>${u.mobile || "—"}</td>
+                <td>${u.whatsapp || "—"}</td>
+                <td>${u.age || "—"}</td>
+                <td>${u.profession || "—"}</td>
+                <td>${u.subscriptionStatus || "—"}</td>
+                <td>${u.purchasedBooksCount}</td>
+            </tr>`).join("");
+        box.innerHTML = `
+            <p class="login-note">${users.length} users mile.</p>
+            <div style="overflow-x:auto">
+            <table class="admin-table">
+                <thead><tr><th>Naam</th><th>Email</th><th>Mobile</th><th>WhatsApp</th><th>Age</th><th>Profession</th><th>Subscription</th><th>Khareedi ebooks</th></tr></thead>
+                <tbody>${rows}</tbody>
+            </table>
+            </div>`;
+    }
+
+    function load() {
+        const u = window.ebookAuth && window.ebookAuth.user;
+        if (!u) { renderLoginPrompt(); return; }
+        renderLoading();
+        (window.adminListUsers ? window.adminListUsers() : Promise.reject(new Error("Abhi load ho raha hai")))
+            .then(renderUsers)
+            .catch(err => {
+                if (err && (err.code === "functions/permission-denied" || /permission-denied/.test(err.message || ""))) renderDenied();
+                else box.innerHTML = `<div class="empty-state">Load nahi ho paaya: ${(err && err.message) || err}</div>`;
+            });
+    }
+
+    onAuth(load);
 }
 
 // ---------- 3D tilt interaction (cards + book cover) ----------

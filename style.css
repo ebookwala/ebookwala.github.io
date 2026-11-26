@@ -148,6 +148,34 @@ nav.categories button:hover{transform:translateY(-2px) scale(1.06)}
 .purchase-list .mini-btn{flex:none;padding:6px 14px}
 
 /* ================================================================
+   Mandatory profile gate (shown right after login, every page)
+   ================================================================ */
+.profile-gate-overlay{position:fixed;inset:0;background:rgba(4,19,10,.75);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px}
+.profile-gate-card{background:var(--card-bg);border-radius:16px;padding:28px 26px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.4);max-height:92vh;overflow-y:auto;text-align:center}
+.profile-gate-card h2{margin:0 0 8px;font-size:1.3rem}
+.profile-gate-card > p{margin:0 0 18px;color:var(--muted);font-size:.92rem}
+.profile-gate-card .link-btn{margin-top:14px;font-size:.84rem;color:var(--muted);text-decoration:underline}
+
+/* Shared by the mandatory gate's form and the account page's edit form */
+.profile-form{text-align:left;display:flex;flex-direction:column;gap:12px}
+.profile-form label{font-size:.88rem;font-weight:600;color:var(--text);display:flex;flex-direction:column;gap:4px}
+.profile-form label.pg-checkbox{flex-direction:row;align-items:center;gap:8px;font-weight:500}
+.profile-form input[type=text],.profile-form input[type=tel],.profile-form input[type=number]{border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:1rem;font-family:inherit;width:100%}
+.profile-form input:focus{outline:2px solid var(--accent);border-color:var(--accent)}
+.profile-form .buy-btn{width:auto;align-self:flex-start}
+.profile-gate-card .profile-form .buy-btn{width:100%;text-align:center}
+.pg-error{color:#c62828;font-size:.86rem;margin:0;min-height:1.1em}
+.pg-success{color:var(--accent-dark);font-size:.86rem;margin:0;min-height:1.1em;font-weight:600}
+
+/* ================================================================
+   Admin user table
+   ================================================================ */
+.admin-table{border-collapse:collapse;width:100%;min-width:760px;background:var(--card-bg);border-radius:10px;overflow:hidden}
+.admin-table th,.admin-table td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);font-size:.9rem;white-space:nowrap}
+.admin-table th{background:var(--accent);color:var(--on-accent);font-weight:700}
+.admin-table tr:last-child td{border-bottom:0}
+
+/* ================================================================
    Header "more" menu (app download etc.) — tucked away on mobile
    ================================================================ */
 .menu-wrap{position:relative;display:none}

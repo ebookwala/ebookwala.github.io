@@ -21,7 +21,7 @@ const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const functions = getFunctions(app, "asia-south1"); // must match the deployed function region
 
-window.ebookSub = { active: false, status: null, ready: false, purchasedBooks: [] };
+window.ebookSub = { active: false, status: null, ready: false, purchasedBooks: [], profileCompleted: false, profile: null };
 
 let unsubscribeDoc = null;
 
@@ -32,19 +32,24 @@ function setState(patch) {
 
 function watchUser(uid) {
   if (unsubscribeDoc) { unsubscribeDoc(); unsubscribeDoc = null; }
-  if (!uid) { setState({ active: false, status: null }); return; }
+  if (!uid) { setState({ active: false, status: null, profileCompleted: false, profile: null }); return; }
   unsubscribeDoc = onSnapshot(
     doc(db, "users", uid),
     snap => {
-      const sub = snap.exists() ? snap.data().subscription : null;
+      const data = snap.exists() ? snap.data() : null;
+      const sub = data ? data.subscription : null;
       const status = sub ? sub.status : null;
       // "authenticated" = ₹2 mandate done, 3-day trial running.
       // "active"        = trial over, ₹49/month cycle running.
       const active = status === "authenticated" || status === "active";
-      const purchasedBooks = (snap.exists() && snap.data().purchasedBooks) || [];
-      setState({ active, status, currentEnd: sub && sub.currentEnd, purchasedBooks });
+      const purchasedBooks = (data && data.purchasedBooks) || [];
+      // Mandatory profile gate (mobile/WhatsApp/age/profession) reads this
+      // same live doc — no extra round trip needed.
+      const profileCompleted = !!(data && data.profileCompleted);
+      const profile = data ? { mobile: data.mobile, whatsapp: data.whatsapp, age: data.age, profession: data.profession } : null;
+      setState({ active, status, currentEnd: sub && sub.currentEnd, purchasedBooks, profileCompleted, profile });
     },
-    () => setState({ active: false, status: null })
+    () => setState({ active: false, status: null, profileCompleted: false, profile: null })
   );
 }
 
@@ -129,6 +134,28 @@ window.buyBook = async function buyBook(bookId, title, amount) {
   } catch (e) {
     alert("Purchase shuru nahi ho paaya: " + ((e && e.message) || e));
   }
+};
+
+// Used by the mandatory profile gate and the account page's edit form.
+// Returns true on success, or rejects with a Hindi message to show the user.
+window.saveProfile = async function saveProfile(fields) {
+  const authApi = window.ebookAuth;
+  if (!authApi || !authApi.user) throw new Error("Login zaroori hai.");
+  try {
+    const fn = httpsCallable(functions, "saveProfile");
+    await fn(fields);
+    return true;
+  } catch (e) {
+    throw new Error((e && e.message) || "Profile save nahi ho payi.");
+  }
+};
+
+// Used by admin.html. Only succeeds for the ADMIN_EMAIL Google account —
+// everyone else gets a Firebase "permission-denied" error.
+window.adminListUsers = async function adminListUsers() {
+  const fn = httpsCallable(functions, "adminListUsers");
+  const { data } = await fn();
+  return data.users || [];
 };
 
 window.cancelSubscription = async function cancelSubscription() {
