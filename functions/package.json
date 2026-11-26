@@ -2,7 +2,7 @@
   "name": "ebookwala-functions",
   "description": "Cloud Functions for ebookwala.github.io — Razorpay subscription (3-day trial + monthly autodebit)",
   "engines": {
-    "node": "20"
+    "node": "22"
   },
   "main": "index.js",
   "scripts": {
