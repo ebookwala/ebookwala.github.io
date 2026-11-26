@@ -43,7 +43,10 @@ function renderAuthBar(user) {
     if (user) {
         const first = (user.displayName || user.email || "User").split(" ")[0];
         const photo = user.photoURL ? `<img src="${user.photoURL}" alt="" referrerpolicy="no-referrer">` : "";
-        bar.innerHTML = `<span class="user">${photo}<span>${first}</span></span><button id="logoutBtn">Logout</button>`;
+        // Name/photo is a link to the account page — this is currently the
+        // only way to see your subscription status or purchased books from
+        // anywhere other than the homepage banner.
+        bar.innerHTML = `<a class="user" href="account.html" title="Mera Account">${photo}<span>${first}</span></a><button id="logoutBtn">Logout</button>`;
         document.getElementById("logoutBtn").addEventListener("click", () => window.ebookAuth.logout());
     } else {
         bar.innerHTML = `<button id="loginBtn">🔐 Google se Login</button>`;
@@ -233,7 +236,7 @@ function renderSubBanner() {
     if (sub.active) {
         const endText = sub.currentEnd ? new Date(sub.currentEnd * 1000).toLocaleDateString("hi-IN") : null;
         el.style.display = "flex";
-        el.innerHTML = `<p>✅ Aapka trial/subscription active hai — saari ebooks padh sakte hain.${endText ? " Agla ₹49 charge: " + endText + "." : ""}</p>
+        el.innerHTML = `<p>✅ Aapka trial/subscription active hai — saari ebooks padh sakte hain.${endText ? " Agla ₹49 charge: " + endText + "." : ""} <a href="account.html" style="color:inherit;text-decoration:underline">Plan details dekhein</a></p>
             <button type="button" class="buy-btn secondary" id="subCancelBtn">Subscription Cancel Karein</button>`;
         const cancelBtn = document.getElementById("subCancelBtn");
         if (cancelBtn) cancelBtn.addEventListener("click", () => window.cancelSubscription && window.cancelSubscription());
@@ -631,6 +634,95 @@ async function loadReader(book, user, msg, wrap, bar) {
     } catch (err) {
         msg.textContent = "Ebook khul nahi paayi: " + err.message;
     }
+}
+
+// ---------- Account page: subscription status, plan details, cancel, purchases ----------
+async function initAccountPage() {
+    initAuthBar();
+    initHeaderMenu();
+    const box = document.getElementById("accountDetail");
+    if (!box) return;
+
+    let books = [];
+    try { books = await fetchCatalog(); } catch (e) {}
+
+    function render() {
+        const u = window.ebookAuth && window.ebookAuth.user;
+        if (!window.ebookAuth || !window.ebookAuth.ready) {
+            box.innerHTML = `<div class="empty-state">Load ho raha hai…</div>`;
+            return;
+        }
+        if (!u) {
+            box.innerHTML = `
+                <div class="empty-state">
+                    Apna account — subscription, plan aur khareedi hui ebooks — dekhne ke liye login karein.<br>
+                    <button type="button" class="buy-btn" id="acctLoginBtn" style="margin-top:14px">🔐 Google se Login</button>
+                </div>`;
+            const loginBtn = document.getElementById("acctLoginBtn");
+            if (loginBtn) loginBtn.addEventListener("click", () => requireLogin().then(() => render()));
+            return;
+        }
+
+        const sub = window.ebookSub || {};
+        let subHtml;
+        if (!sub.ready) {
+            subHtml = `<div class="account-card"><p>Subscription status load ho raha hai…</p></div>`;
+        } else if (sub.active) {
+            const isTrial = sub.status === "authenticated";
+            const endText = sub.currentEnd
+                ? new Date(sub.currentEnd * 1000).toLocaleDateString("hi-IN", { day: "numeric", month: "long", year: "numeric" })
+                : null;
+            subHtml = `
+                <div class="account-card">
+                    <h3>${isTrial ? "🎁 3-Din Free Trial chal raha hai" : "✅ Subscription Active (₹49/mahina)"}</h3>
+                    <p>Is plan mein <strong>sabhi ebooks</strong> padhne ki suvidha shaamil hai (download nahi).${endText ? (isTrial ? " Trial khatam hote hi (aur ₹49/mahina shuru hote hi) agla charge: " : " Agla ₹49 charge: ") + "<strong>" + endText + "</strong>." : ""}</p>
+                    <button type="button" class="buy-btn secondary" id="acctCancelBtn">Subscription Cancel Karein</button>
+                </div>`;
+        } else {
+            subHtml = `
+                <div class="account-card">
+                    <h3>Koi active plan nahi</h3>
+                    <p>Abhi koi trial ya subscription active nahi hai. 3-Din Free Trial lekar sabhi ebooks padh sakte hain — abhi sirf ₹2 (verify ke liye), 3 din free, chauthe din se ₹49/mahina (jab chahein cancel karein).</p>
+                    <button type="button" class="buy-btn" id="acctTrialBtn">🎁 Free Trial Shuru Karein</button>
+                </div>`;
+        }
+
+        // Only list ids that are real, readable books — a combo id itself
+        // (also present once its volumes are unlocked) has no file of its own.
+        const purchased = (sub.purchasedBooks || []).filter(id => {
+            const b = books.find(x => x.id === id);
+            return b && b.file;
+        });
+        const purchasedHtml = purchased.length
+            ? `<ul class="purchase-list">${purchased.map(id => {
+                  const b = books.find(x => x.id === id);
+                  return `<li>${b ? b.title : id} <a class="mini-btn" href="read.html?id=${encodeURIComponent(id)}">📖 Padhein</a></li>`;
+              }).join("")}</ul>`
+            : `<p class="login-note">Abhi tak koi ebook individually khareedi nahi hai (subscription ke alawa).</p>`;
+
+        box.innerHTML = `
+            <div class="account-card account-header">
+                ${u.photoURL ? `<img src="${u.photoURL}" alt="" referrerpolicy="no-referrer">` : ""}
+                <div>
+                    <h2>${u.displayName || "Aapka Account"}</h2>
+                    <p class="login-note">${u.email || ""}</p>
+                </div>
+            </div>
+            ${subHtml}
+            <div class="account-card">
+                <h3>📚 Khareedi hui ebooks</h3>
+                ${purchasedHtml}
+            </div>`;
+
+        const cancelBtn = document.getElementById("acctCancelBtn");
+        if (cancelBtn) cancelBtn.addEventListener("click", () => window.cancelSubscription && window.cancelSubscription());
+        const trialBtn = document.getElementById("acctTrialBtn");
+        if (trialBtn) trialBtn.addEventListener("click", () => window.startTrial && window.startTrial());
+    }
+
+    onAuth(render);
+    window.addEventListener("ebook-sub", render);
+    render();
 }
 
 // ---------- 3D tilt interaction (cards + book cover) ----------
