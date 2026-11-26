@@ -1,0 +1,64 @@
+name: Notify users of new books
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - books.json
+
+permissions:
+  contents: read
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (with history for diff)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Find newly-added books
+        id: diff
+        run: |
+          set -e
+          # Old version of books.json (before this push). If this is the very
+          # first commit touching the file, treat it as "no previous books".
+          if git show HEAD~1:books.json > old_books.json 2>/dev/null; then
+            :
+          else
+            echo "[]" > old_books.json
+          fi
+          cp books.json new_books.json
+
+          node -e '
+            const fs = require("fs");
+            const oldBooks = JSON.parse(fs.readFileSync("old_books.json", "utf8"));
+            const newBooks = JSON.parse(fs.readFileSync("new_books.json", "utf8"));
+            const oldIds = new Set(oldBooks.map(b => b.id));
+            const added = newBooks.filter(b => !oldIds.has(b.id));
+            fs.writeFileSync("added_books.json", JSON.stringify(
+              added.map(b => ({ id: b.id, title: b.title }))
+            ));
+            console.log(`Added books: ${added.length}`);
+            fs.appendFileSync(process.env.GITHUB_OUTPUT, `count=${added.length}\n`);
+          '
+
+      - name: Notify subscribers
+        if: steps.diff.outputs.count != '0'
+        env:
+          NOTIFY_SECRET: ${{ secrets.NOTIFY_SECRET }}
+          NOTIFY_FUNCTION_URL: ${{ secrets.NOTIFY_FUNCTION_URL }}
+        run: |
+          set -e
+          if [ -z "$NOTIFY_FUNCTION_URL" ]; then
+            echo "NOTIFY_FUNCTION_URL secret not set yet — skipping notification call."
+            echo "(Add it in GitHub repo Settings > Secrets > Actions once the Cloud Function is deployed.)"
+            exit 0
+          fi
+          BOOKS=$(cat added_books.json)
+          curl -sS -X POST "$NOTIFY_FUNCTION_URL" \
+            -H "Content-Type: application/json" \
+            -H "x-notify-secret: $NOTIFY_SECRET" \
+            -d "{\"books\": $BOOKS}" \
+            --fail-with-body
