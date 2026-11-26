@@ -87,7 +87,13 @@
         "description": "Combo offer: ChatGPT Mastering ke chaaron volume (1, 2, 3 aur 4) ek saath sirf ₹149 mein, alag-alag kharidne par ₹196 lagte. AI ki buniyaad se lekar Image Generation, Development aur Education tak ka poora safar.",
         "preview": "ChatGPT Mastering ke chaaron volumes ek saath: AI ka itihaas aur ChatGPT, AI Images aur 3D Art, Development aur Agents, aur Education aur Productivity.",
         "razorpayLink": "https://rzp.io/rzp/oYMK1qRO",
-        "free": false
+        "free": false,
+        "comboItems": [
+            "chatgpt-mastering-volume-1",
+            "chatgpt-mastering-volume-2",
+            "chatgpt-mastering-volume-3",
+            "chatgpt-mastering-volume-4"
+        ]
     },
     {
         "id": "naukri-ya-business",
@@ -168,7 +174,12 @@
         "description": "Combo offer: Gemini Encyclopedia ke teeno volume (1, 2 aur 3) ek saath sirf ₹249 mein, alag-alag kharidne par ₹297 lagte. Adhyay 1-2160 tak — Gemini ki buniyaad aur prompting se lekar AI Image Generation, Gemini Live, Canvas, Deep Research, Workspace Integration, Developer Foundations, Agents & Automation aur real-world case studies tak ka poora safar.",
         "preview": "Gemini Encyclopedia ke teeno volumes ek saath: Volume 1 (Gemini ki buniyaad, prompting, Canvas, Gems, Deep Research, Workspace), Volume 2 (AI Image Generation, Gemini Live, Apps & Extensions) aur Volume 3 (Developer Foundations, Advanced features, Veo, Imagen, Agents & Automation).",
         "razorpayLink": "https://rzp.io/rzp/8mJdJAkr",
-        "free": false
+        "free": false,
+        "comboItems": [
+            "gemini-encyclopedia-volume-1",
+            "gemini-encyclopedia-volume-2",
+            "gemini-encyclopedia-volume-3"
+        ]
     },
     {
         "id": "surya-mahavigyan",
@@ -336,7 +347,13 @@
         "description": "Combo offer: Google Flow Hindi Vishwakosh ke chaaron volume (1, 2, 3 aur 4) ek saath sirf ₹349 mein, alag-alag kharidne par ₹396 lagte. AI फिल्म निर्माण की बुनियाद से लेकर इमेज-टू-वीडियो, उन्नत Flow Agent टूल्स, तथा कहानी से अंतिम पोर्टफोलियो तक — कुल 24 पार्ट और 1440 पाठों का पूरा सफर।",
         "preview": "Google Flow ke chaaron volumes ek saath: Volume 1 (Flow ka itihaas, account, model vishwakosh, cinematic drishya bhasha), Volume 2 (Nano Banana image creation, image editing, character reference, Text to Video, Frames to Video), Volume 3 (Flow Agent, Batch Tools, Video to Video, Extend aur Scenebuilder, sound aur Avatar) aur Volume 4 (kahani aur nirman yojana, Jyotish reels, brand vigyapan, lagat-download, samasya samadhan, capstone portfolio).",
         "razorpayLink": "https://rzp.io/rzp/D55rYvB0",
-        "free": false
+        "free": false,
+        "comboItems": [
+            "google-flow-volume-1",
+            "google-flow-volume-2",
+            "google-flow-volume-3",
+            "google-flow-volume-4"
+        ]
     },
     {
         "id": "claude-ai-se-online-kamai",

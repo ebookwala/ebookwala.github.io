@@ -29,9 +29,17 @@
   <header>
     <h1><a href="index.html">📚 ebookwala</a></h1>
     <div class="search-box">
-      <input type="text" id="searchInput" placeholder="Ebook ya kahani khojein...">
+      <input type="text" id="searchInput" placeholder="Ebook ya kahani khojein... (Hindi ya Roman mein)">
     </div>
-    <a class="buy-btn" style="padding:8px 16px;font-size:0.9rem" href="https://github.com/ebookwala/ebookwala.github.io/releases/latest/download/ebookwala.apk">📱 App Download Karein</a>
+    <a class="buy-btn header-app-link" style="padding:8px 16px;font-size:0.9rem" href="https://github.com/ebookwala/ebookwala.github.io/releases/latest/download/ebookwala.apk">📱 App Download Karein</a>
+    <div class="menu-wrap">
+      <button type="button" class="menu-toggle" id="menuToggle" aria-label="Aur vikalp">☰</button>
+      <div class="menu-dropdown" id="menuDropdown">
+        <a href="https://github.com/ebookwala/ebookwala.github.io/releases/latest/download/ebookwala.apk">📱 App Download Karein</a>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="terms.html">Terms &amp; Conditions</a>
+      </div>
+    </div>
     <div class="auth-bar" id="authBar"></div>
   </header>
 
@@ -44,12 +52,27 @@
       <p>Padhein, download karein ya online padhein — Google login ke saath, ek hi jagah.</p>
       <div class="hero-actions">
         <a class="buy-btn" href="#bookGrid">📖 Sabhi Ebooks Dekhein</a>
-        <a class="buy-btn secondary" href="https://github.com/ebookwala/ebookwala.github.io/releases/latest/download/ebookwala.apk">📱 App Download Karein</a>
+        <a class="buy-btn secondary" href="#bookGrid" onclick="window.selectTypeAndScroll && window.selectTypeAndScroll('free');return false;">🆓 Free Ebooks</a>
       </div>
     </div>
   </div>
 
   <nav class="categories" id="categoryNav"></nav>
+
+  <div class="filter-bar">
+    <div class="type-filters" id="typeFilters">
+      <button type="button" data-type="all" class="active">Sabhi</button>
+      <button type="button" data-type="free">Free</button>
+      <button type="button" data-type="paid">Paid</button>
+      <button type="button" data-type="combo">Combo</button>
+    </div>
+    <select id="sortSelect" aria-label="Sort karein">
+      <option value="default">Sort: Default</option>
+      <option value="price-asc">Price: Kam se Zyada</option>
+      <option value="price-desc">Price: Zyada se Kam</option>
+    </select>
+    <span class="result-count" id="resultCount"></span>
+  </div>
 
   <main>
     <div class="sub-banner" id="subBanner" style="display:none"></div>

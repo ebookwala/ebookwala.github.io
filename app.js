@@ -3,6 +3,23 @@
 
 let ALL_BOOKS = [];
 let activeCategory = "All";
+let activeType = "all";   // all | free | paid | combo
+let activeSort = "default"; // default | price-asc | price-desc
+
+function bookType(b) {
+    if (Array.isArray(b.comboItems) && b.comboItems.length) return "combo";
+    if (b.free || b.price === 0) return "free";
+    return "paid";
+}
+
+// A lowercase blob of every field a reader might type, so search works
+// whether they type Devanagari ("राहु") or the romanized spelling ("rahu") —
+// the book's own id (e.g. "rahu-mahagranth") already is that romanization.
+function buildSearchIndex(b) {
+    return [b.title, b.description, b.author, b.category, (b.id || "").replace(/[-_]/g, " ")]
+        .join(" ")
+        .toLowerCase();
+}
 
 // ---------- Login helpers (auth.js sets window.ebookAuth) ----------
 function onAuth(cb) {
@@ -37,24 +54,57 @@ function renderAuthBar(user) {
 function initAuthBar() { onAuth(renderAuthBar); }
 
 // ---------- Catalog ----------
-async function loadBooks() {
+const CATALOG_CACHE_KEY = "ebookwala:catalog-cache-v1";
+const CATALOG_CACHE_TTL = 10 * 60 * 1000; // 10 minutes — fresh enough, avoids refetching on every page
+
+async function fetchCatalog() {
+    // Serve a recent copy from this browser's sessionStorage first so moving
+    // between the homepage, a book page and the reader doesn't re-download
+    // books.json (and every book cover's dimensions) each time. A hard
+    // refresh or a new tab still gets a live fetch.
+    try {
+        const cached = JSON.parse(sessionStorage.getItem(CATALOG_CACHE_KEY) || "null");
+        if (cached && Date.now() - cached.t < CATALOG_CACHE_TTL) return cached.books;
+    } catch (e) {}
     const res = await fetch("books.json?v=" + Date.now(), { cache: "no-store" });
-    ALL_BOOKS = await res.json();
-    renderCategories();
-    renderGrid(ALL_BOOKS);
-    buildHeroMosaic();
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const books = await res.json();
+    try { sessionStorage.setItem(CATALOG_CACHE_KEY, JSON.stringify({ t: Date.now(), books })); } catch (e) {}
+    return books;
+}
+
+async function loadBooks() {
+    const grid = document.getElementById("bookGrid");
+    try {
+        ALL_BOOKS = await fetchCatalog();
+        ALL_BOOKS.forEach(b => { b._search = buildSearchIndex(b); });
+        renderCategories();
+        renderGrid(ALL_BOOKS);
+        buildHeroMosaic();
+    } catch (e) {
+        if (grid) {
+            grid.innerHTML = `<div class="empty-state">Ebooks load nahi ho payin. Internet check karein.<br>
+                <button type="button" class="buy-btn secondary" id="retryLoadBtn" style="margin-top:14px">🔄 Dobara Try Karein</button></div>`;
+            const btn = document.getElementById("retryLoadBtn");
+            if (btn) btn.addEventListener("click", () => { try { sessionStorage.removeItem(CATALOG_CACHE_KEY); } catch (e2) {} loadBooks(); });
+        }
+    }
 }
 
 // Fills the home page's hero background with a tiled mosaic of real book covers.
+// Kept small on phones (fewer, smaller tiles) since it's pure decoration behind
+// the hero text and shouldn't cost a slow connection dozens of image loads.
 function buildHeroMosaic() {
     const mosaic = document.getElementById("heroMosaic");
     if (!mosaic || !ALL_BOOKS.length) return;
+    const isSmall = window.matchMedia && window.matchMedia("(max-width:600px)").matches;
+    const tileCount = isSmall ? 16 : 48;
     const covers = ALL_BOOKS.map(b => b.cover).filter(Boolean);
     // Repeat/shuffle the cover list so the mosaic fills a wide strip even with few books.
     const tiles = [];
     const shuffled = [...covers].sort(() => Math.random() - 0.5);
-    while (tiles.length < 48) tiles.push(...shuffled);
-    mosaic.innerHTML = tiles.slice(0, 48).map((src, i) =>
+    while (tiles.length < tileCount) tiles.push(...shuffled);
+    mosaic.innerHTML = tiles.slice(0, tileCount).map((src, i) =>
         `<img src="${src}" alt="" loading="lazy" style="animation-delay:${Math.min(i * 0.02, 0.6)}s">`
     ).join("");
 }
@@ -75,38 +125,105 @@ function renderCategories() {
     });
 }
 
+function shortDesc(b, len) {
+    len = len || 78;
+    const d = (b.description || "").trim();
+    return d.length > len ? d.slice(0, len).trim() + "…" : d;
+}
+
+// The two/three buttons shown on a card, matched to what that book actually
+// needs: a free book just opens; a paid book (or combo) gets a no-login
+// sample link plus a one-tap buy that skips the detail page entirely.
+function cardActionsHtml(b) {
+    const type = bookType(b);
+    const href = encodeURIComponent(b.id) + ".html";
+    if (type === "free") {
+        if (!b.file) return `<a class="mini-btn" href="${href}">Vivaran Dekhein</a>`;
+        return `<button type="button" class="mini-btn" data-action="free-read" data-id="${b.id}">📖 Free Padhein</button>`;
+    }
+    const buyLabel = (type === "combo" ? "🎁 " : "") + "₹" + b.price + " mein Khareedein";
+    return `
+        <a class="mini-btn ghost" href="${href}#previewBox">Namuna Padhein</a>
+        <button type="button" class="mini-btn" data-action="buy" data-id="${b.id}" data-price="${b.price}" data-title="${encodeURIComponent(b.title)}">${buyLabel}</button>`;
+}
+
 function renderGrid(books) {
     const grid = document.getElementById("bookGrid");
     if (!grid) return;
     if (books.length === 0) {
-        grid.innerHTML = `<div class="empty-state">Koi ebook nahi mili. Dusra search try karein.</div>`;
+        grid.innerHTML = `<div class="empty-state">Koi ebook nahi mili. Dusra search ya filter try karein.</div>`;
         return;
     }
-    grid.innerHTML = books.map(b => `
-        <a class="card" href="${encodeURIComponent(b.id)}.html">
-            <img src="${b.cover}" alt="${b.title}" loading="lazy">
+    grid.innerHTML = books.map(b => {
+        const href = encodeURIComponent(b.id) + ".html";
+        const type = bookType(b);
+        const priceText = type === "free" ? "Free" : ("₹" + b.price + (type === "combo" ? " · Combo" : ""));
+        return `
+        <div class="card${type === "combo" ? " is-combo" : ""}">
+            <a class="card-media" href="${href}">
+                <img src="${b.cover}" alt="${b.title}" loading="lazy">
+                <span class="category-badge">${b.category}</span>
+            </a>
             <div class="info">
-                <p class="title">${b.title}</p>
-                <p class="price ${b.free || b.price === 0 ? 'free' : ''}">${b.free || b.price === 0 ? 'Free' : '₹' + b.price}</p>
+                <a class="title" href="${href}">${b.title}</a>
+                <p class="desc">${shortDesc(b)}</p>
+                <p class="price ${type === "free" ? "free" : ""}">${priceText}</p>
+                <div class="card-actions">${cardActionsHtml(b)}</div>
             </div>
-        </a>
-    `).join("");
+        </div>`;
+    }).join("");
+}
+
+// One delegated listener handles every card's buttons, so re-rendering the
+// grid (new search, filter, category) never needs to re-bind anything.
+function initGridActions() {
+    const grid = document.getElementById("bookGrid");
+    if (!grid) return;
+    grid.addEventListener("click", e => {
+        const freeBtn = e.target.closest('[data-action="free-read"]');
+        if (freeBtn) {
+            e.preventDefault();
+            requireLogin().then(u => { if (u) window.location.href = "read.html?id=" + encodeURIComponent(freeBtn.dataset.id); });
+            return;
+        }
+        const buyBtn = e.target.closest('[data-action="buy"]');
+        if (buyBtn) {
+            e.preventDefault();
+            const id = buyBtn.dataset.id, price = Number(buyBtn.dataset.price), title = decodeURIComponent(buyBtn.dataset.title || "");
+            requireLogin().then(u => { if (u) window.buyBook && window.buyBook(id, title, price); });
+        }
+    });
 }
 
 function applyFilters() {
     const query = (document.getElementById("searchInput")?.value || "").trim().toLowerCase();
+    const tokens = query.split(/\s+/).filter(Boolean);
     let filtered = ALL_BOOKS;
     if (activeCategory !== "All") {
         filtered = filtered.filter(b => b.category === activeCategory);
     }
-    if (query) {
-        filtered = filtered.filter(b =>
-            b.title.toLowerCase().includes(query) ||
-            b.description.toLowerCase().includes(query)
-        );
+    if (activeType !== "all") {
+        filtered = filtered.filter(b => bookType(b) === activeType);
     }
+    if (tokens.length) {
+        // Every typed word must appear somewhere in the book's index — lets
+        // "rahu mahagranth" or just "mahagranth" both find the same book.
+        filtered = filtered.filter(b => tokens.every(t => (b._search || buildSearchIndex(b)).includes(t)));
+    }
+    if (activeSort === "price-asc") filtered = [...filtered].sort((a, b) => (a.price || 0) - (b.price || 0));
+    else if (activeSort === "price-desc") filtered = [...filtered].sort((a, b) => (b.price || 0) - (a.price || 0));
     renderGrid(filtered);
+    const countEl = document.getElementById("resultCount");
+    if (countEl) countEl.textContent = filtered.length + " parinaam mile";
 }
+
+// Used by the hero's "🆓 Free Ebooks" shortcut button.
+window.selectTypeAndScroll = function selectTypeAndScroll(type) {
+    activeType = type;
+    document.querySelectorAll("#typeFilters button").forEach(btn => btn.classList.toggle("active", btn.dataset.type === type));
+    applyFilters();
+    document.getElementById("bookGrid").scrollIntoView({ behavior: "smooth", block: "start" });
+};
 
 function renderSubBanner() {
     const el = document.getElementById("subBanner");
@@ -114,15 +231,16 @@ function renderSubBanner() {
     const sub = window.ebookSub || {};
     if (!sub.ready) { el.style.display = "none"; return; }
     if (sub.active) {
+        const endText = sub.currentEnd ? new Date(sub.currentEnd * 1000).toLocaleDateString("hi-IN") : null;
         el.style.display = "flex";
-        el.innerHTML = `<p>✅ Aapka trial/subscription active hai — saari ebooks padh sakte hain.</p>
+        el.innerHTML = `<p>✅ Aapka trial/subscription active hai — saari ebooks padh sakte hain.${endText ? " Agla ₹49 charge: " + endText + "." : ""}</p>
             <button type="button" class="buy-btn secondary" id="subCancelBtn">Subscription Cancel Karein</button>`;
         const cancelBtn = document.getElementById("subCancelBtn");
         if (cancelBtn) cancelBtn.addEventListener("click", () => window.cancelSubscription && window.cancelSubscription());
         return;
     }
     el.style.display = "flex";
-    el.innerHTML = `<p>🎁 3-Din Free Trial lein — sirf ₹2 mein sabhi ebooks padhein (trial ke baad ₹49/month, kabhi bhi cancel karein)</p>
+    el.innerHTML = `<p>🎁 3-Din Free Trial — abhi sirf ₹2 lagega (card/UPI verify karne ke liye), 3 din tak <strong>sabhi ebooks</strong> padhein. Chauthe din se ₹49/mahina apne-aap shuru hoga, jise aap yahin se jab chahein cancel kar sakte hain.</p>
         <button type="button" class="buy-btn" id="subTrialBtn">Free Trial Shuru Karein</button>`;
     const trialBtn = document.getElementById("subTrialBtn");
     if (trialBtn) trialBtn.addEventListener("click", () => window.startTrial && window.startTrial());
@@ -130,12 +248,39 @@ function renderSubBanner() {
 
 function initHome() {
     initAuthBar();
+    initHeaderMenu();
     loadBooks();
+    initGridActions();
     const search = document.getElementById("searchInput");
     if (search) search.addEventListener("input", applyFilters);
+    const typeFilters = document.getElementById("typeFilters");
+    if (typeFilters) {
+        typeFilters.addEventListener("click", e => {
+            const btn = e.target.closest("button[data-type]");
+            if (!btn) return;
+            activeType = btn.dataset.type;
+            typeFilters.querySelectorAll("button").forEach(b => b.classList.toggle("active", b === btn));
+            applyFilters();
+        });
+    }
+    const sortSelect = document.getElementById("sortSelect");
+    if (sortSelect) sortSelect.addEventListener("change", () => { activeSort = sortSelect.value; applyFilters(); });
     onAuth(renderSubBanner);
     window.addEventListener("ebook-sub", renderSubBanner);
     renderSubBanner();
+}
+
+// Small "☰ More" dropdown used on narrow screens to tuck away the app-download
+// link so the header stays short — search and categories stay visible instead
+// of being pushed below the fold.
+function initHeaderMenu() {
+    const btn = document.getElementById("menuToggle");
+    const menu = document.getElementById("menuDropdown");
+    if (!btn || !menu) return;
+    btn.addEventListener("click", () => menu.classList.toggle("open"));
+    document.addEventListener("click", e => {
+        if (!menu.contains(e.target) && e.target !== btn) menu.classList.remove("open");
+    });
 }
 
 // ---------- Book detail page ----------
@@ -143,10 +288,14 @@ async function initBookPage() {
     initAuthBar();
     const params = new URLSearchParams(window.location.search);
     const id = window.BOOK_ID || params.get("id");
-    const res = await fetch("books.json?v=" + Date.now(), { cache: "no-store" });
-    const books = await res.json();
-    const book = books.find(b => b.id === id);
     const container = document.getElementById("bookDetail");
+    let books;
+    try { books = await fetchCatalog(); }
+    catch (e) {
+        container.innerHTML = `<div class="empty-state">Ebook load nahi ho payi. Internet check karke <a href="javascript:location.reload()">dobara try karein</a>.</div>`;
+        return;
+    }
+    const book = books.find(b => b.id === id);
     if (!book) {
         container.innerHTML = `<div class="empty-state">Ebook nahi mili.</div>`;
         return;
@@ -164,6 +313,25 @@ async function initBookPage() {
             <p class="login-note" id="loginNote"></p>`;
     } else if (isFree) {
         actions = `<p class="login-note">Is ebook ki file abhi upload nahi hui. Jald hi aayegi.</p>`;
+    } else if (Array.isArray(book.comboItems) && book.comboItems.length) {
+        // A combo bundle has no reader file of its own — it unlocks the
+        // individual volumes listed in comboItems (each already a normal
+        // paid book with its own file). Buy it the same in-site way as any
+        // other paid book so the purchase webhook can unlock every volume.
+        const itemRows = book.comboItems.map(cid => {
+            const cb = books.find(x => x.id === cid);
+            return `<li data-combo-item="${cid}">${cb ? cb.title : cid}</li>`;
+        }).join("");
+        actions = `
+            <div class="btn-row">
+                <button class="buy-btn" id="buyBtn">🎁 Combo Khareedein — ₹${book.price}</button>
+            </div>
+            <p class="login-note" id="loginNote"></p>
+            <div class="combo-items" id="comboItemsBox">
+                <p class="combo-items-label">Is combo mein shaamil ${book.comboItems.length} PDF ebooks:</p>
+                <ul>${itemRows}</ul>
+                <p class="combo-items-note">Format: PDF. Khareedne ke turant baad (payment confirm hote hi) har volume yahin neeche "📖 Padhein" button se khulega — login ke saath, bina dobara payment kiye.</p>
+            </div>`;
     } else if (book.file) {
         // Paid book with a readable file: buy it once, OR unlock it (and every
         // other book) with the 3-day trial / ₹49-month subscription.
@@ -173,7 +341,7 @@ async function initBookPage() {
                 <button class="buy-btn secondary" id="readBtn">📖 Padhein</button>
             </div>
             <p class="login-note" id="loginNote"></p>
-            <p class="trial-note">🎁 Ya <button type="button" class="link-btn" id="trialBtn">3-Din Free Trial</button> lekar <strong>sabhi ebooks</strong> padhein — sirf ₹2, trial ke baad ₹49/month (kabhi bhi cancel karein)</p>`;
+            <p class="trial-note">🎁 Ya <button type="button" class="link-btn" id="trialBtn">3-Din Free Trial</button> lekar <strong>sabhi ebooks</strong> padhein — abhi sirf ₹2 (verify ke liye), 3 din free, chauthe din se ₹49/mahina (jab chahen upar se cancel karein)</p>`;
     } else {
         actions = `<a class="buy-btn" href="${book.razorpayLink || '#'}" target="_blank" rel="noopener">Khareedein — ₹${book.price}</a>`;
     }
@@ -187,7 +355,8 @@ async function initBookPage() {
             <div class="price-tag ${isFree ? 'free' : ''}">${isFree ? 'Free' : '₹' + book.price}</div>
             ${actions}
             <div class="share-wrap" id="shareWrap"></div>
-            <div class="preview-box">${book.preview}</div>
+            <p class="preview-label">📖 Namuna (koi login zaroori nahi):</p>
+            <div class="preview-box" id="previewBox">${book.preview}</div>
         </div>`;
 
     initShare(book);
@@ -214,6 +383,35 @@ async function initBookPage() {
                 ? "✅ Aap login hain, padh ya download kar sakte hain."
                 : "🔒 Padhne ya download karne ke liye Google se login zaroori hai.";
         });
+    } else if (!isFree && Array.isArray(book.comboItems) && book.comboItems.length) {
+        const owns = () => window.ebookSub && (window.ebookSub.active || (window.ebookSub.purchasedBooks || []).includes(book.id));
+        const buyBtn = document.getElementById("buyBtn");
+        if (buyBtn) buyBtn.addEventListener("click", () => {
+            requireLogin().then(u => { if (u) window.buyBook && window.buyBook(book.id, book.title, book.price); });
+        });
+        const renderComboState = () => {
+            const note = document.getElementById("loginNote");
+            const box = document.getElementById("comboItemsBox");
+            if (!box) return;
+            const u = window.ebookAuth && window.ebookAuth.user;
+            if (!u) {
+                if (note) note.textContent = "🔒 Khareedne ya padhne ke liye Google se login zaroori hai.";
+                return;
+            }
+            if (owns()) {
+                if (note) note.textContent = "✅ Aapne ye combo khareeda hai — neeche se har volume padhein.";
+                box.querySelectorAll("li[data-combo-item]").forEach(li => {
+                    const cid = li.dataset.comboItem;
+                    if (li.querySelector("a")) return;
+                    li.innerHTML += ` <a class="mini-btn" href="read.html?id=${encodeURIComponent(cid)}">📖 Padhein</a>`;
+                });
+            } else if (note) {
+                note.textContent = "Khareedne ke baad yahin se sabhi volumes padh sakte hain.";
+            }
+        };
+        onAuth(renderComboState);
+        window.addEventListener("ebook-sub", renderComboState);
+        renderComboState();
     } else if (!isFree && book.file) {
         const owns = () => window.ebookSub && (window.ebookSub.active || (window.ebookSub.purchasedBooks || []).includes(book.id));
         document.getElementById("readBtn").addEventListener("click", () => {
@@ -314,8 +512,12 @@ async function initReader() {
     const wrap = document.getElementById("readerWrap");
     const bar = document.getElementById("readerBar");
 
-    const res = await fetch("books.json?v=" + Date.now(), { cache: "no-store" });
-    const books = await res.json();
+    let books;
+    try { books = await fetchCatalog(); }
+    catch (e) {
+        msg.innerHTML = "Ebook load nahi ho payi. <a class='back-link' href='javascript:location.reload()'>🔄 Dobara try karein</a>";
+        return;
+    }
     const book = books.find(b => b.id === id);
     if (!book || !book.file) {
         msg.innerHTML = "Ebook nahi mili. <a class='back-link' href='index.html'>← Wapas jaayein</a>";

@@ -216,11 +216,27 @@ exports.razorpayWebhook = onRequest(
       const buyerUid = orderEntity.notes && orderEntity.notes.firebaseUid;
       const bookId = orderEntity.notes && orderEntity.notes.bookId;
       if (buyerUid && bookId) {
+        // A combo (e.g. "chatgpt-mastering-combo") has no readable file of its
+        // own — its books.json entry instead lists comboItems: the real book
+        // ids bundled inside it. Unlock every one of those too, so the buyer
+        // can read each volume on its own page right after paying, not just
+        // the combo id itself.
+        let idsToUnlock = [bookId];
+        try {
+          const booksRes = await fetch("https://ebookwala.github.io/books.json");
+          const books = await booksRes.json();
+          const book = books.find((b) => b.id === bookId);
+          if (book && Array.isArray(book.comboItems) && book.comboItems.length) {
+            idsToUnlock = idsToUnlock.concat(book.comboItems);
+          }
+        } catch (err) {
+          logger.error("Fetching books.json for combo lookup failed", err);
+        }
         await db.collection("users").doc(buyerUid).set(
-          { purchasedBooks: admin.firestore.FieldValue.arrayUnion(bookId) },
+          { purchasedBooks: admin.firestore.FieldValue.arrayUnion(...idsToUnlock) },
           { merge: true }
         );
-        logger.info("Book purchase unlocked", { uid: buyerUid, bookId, orderId: orderEntity.id });
+        logger.info("Book purchase unlocked", { uid: buyerUid, bookId, idsToUnlock, orderId: orderEntity.id });
       } else {
         logger.warn("order.paid webhook missing notes", { orderId: orderEntity.id });
       }
